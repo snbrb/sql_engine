@@ -1,5 +1,6 @@
 //import 'package:flutter/foundation.dart';
-import 'package:flutter/rendering.dart';
+// ignore_for_file: avoid_print
+
 import 'package:sqlite3/common.dart';
 
 import '../config.dart';
@@ -74,7 +75,7 @@ class SqlEngineDatabase {
       final Row row = database.select('PRAGMA user_version').first;
       final int currentVersion = row['user_version'] as int;
       if (enableLog) {
-        debugPrint(' Current DB Version: $currentVersion (Target: $version)');
+        print(' Current DB Version: $currentVersion (Target: $version)');
       }
       //e.g user create db object with version 2 and current version is 1
       if (currentVersion < version) {
@@ -85,7 +86,7 @@ class SqlEngineDatabase {
 
   Future<void> _onCreate() async {
     if (enableLog) {
-      debugPrint(' Running _onCreate() - Creating migrations table');
+      print(' Running _onCreate() - Creating migrations table');
     }
     database.execute('PRAGMA journal_mode = $mode');
     // Ensure the `_migrations` table exists
@@ -125,7 +126,7 @@ class SqlEngineDatabase {
       );
     }
 
-    debugPrint(' Tables and migrations initialized.');
+    print(' Tables and migrations initialized.');
   }
 
   Future<void> _applyMigrations(int fromVersion, int toVersion) async {
@@ -213,7 +214,7 @@ class SqlEngineDatabase {
   ]) async {
     try {
       if (enableLog) {
-        debugPrint('[SQL] $sql\nParameters: $parameters');
+        print('[SQL] $sql\nParameters: $parameters');
       }
       return _db!.select(sql, parameters);
     } catch (e) {
@@ -271,9 +272,9 @@ class SqlEngineDatabase {
 
       // Log the query if logging is enabled
       if (enableLog) {
-        debugPrint('[SQL] $sql');
+        print('[SQL] $sql');
         if (positionalParams.isNotEmpty) {
-          debugPrint('Parameters: $positionalParams');
+          print('Parameters: $positionalParams');
         }
       }
 
@@ -390,7 +391,7 @@ class SqlEngineDatabase {
   ''';
 
     if (enableLog) {
-      debugPrint('[SQL][FTS5] $sql');
+      print('[SQL][FTS5] $sql');
     }
     database.execute(sql);
   }
