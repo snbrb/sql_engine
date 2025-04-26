@@ -13,9 +13,9 @@ dependencies:
   flutter:
     sdk: flutter
   sqlite3: ^2.7.5
-  meta: 1.16.0
+  meta: ^1.16.0
   build: ^2.4.0
-  source_gen: any
+  source_gen: ^2.0.0
   analyzer: ^6.7.0
   path: ^1.9.1
   sqlite3_flutter_libs: ^0.5.32
