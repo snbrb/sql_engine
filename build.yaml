@@ -1,0 +1,17 @@
+targets:
+  $default:
+    builders:
+      sql_engine|sql_engine_builder:
+        enabled: true
+        generate_for:
+          - test/models/**.dart
+          - lib/src/models/**.dart
+          - lib/app_database.dart
+
+builders:
+  sql_engine_builder:
+    import: "package:sql_engine/sql_engine_builder.dart"
+    builder_factories: ["sqlEngineBuilder"]
+    build_extensions: {".dart": [".g.dart"]}
+    auto_apply: dependents
+    build_to: source

@@ -1,0 +1,91 @@
+##https://dart.dev/tools/linter-rules
+
+# Include default Flutter lint rules
+include: package:flutter_lints/flutter.yaml
+
+## Analyzer configuration
+#analyzer:
+#  errors:
+#    avoid_print: error
+#  exclude:
+#    - misc
+#    - build/**
+#  #    - lib/**.freezed.dart
+#  #    - lib/**.g.dart
+#  #    - lib/**.gr.dart
+#  #    - lib/**.gm.dart
+##  plugins:
+##    - custom_lint
+
+# Linter configuration: Specify individual rules
+linter:
+  rules:
+    unawaited_futures: true
+    prefer_single_quotes: true
+    prefer_relative_imports: true
+    always_use_package_imports: false
+    always_declare_return_types: true
+    avoid_empty_else: true
+    avoid_print: true
+    always_put_control_body_on_new_line: true
+    always_put_required_named_parameters_first: true
+    annotate_overrides: true
+    avoid_catches_without_on_clauses: true
+    avoid_function_literals_in_foreach_calls: true
+    avoid_init_to_null: true
+    avoid_multiple_declarations_per_line: true
+    avoid_positional_boolean_parameters: true
+    avoid_redundant_argument_values: false
+    avoid_renaming_method_parameters: true
+    avoid_return_types_on_setters: true
+    avoid_returning_null_for_void: true
+    avoid_single_cascade_in_expression_statements: true
+    avoid_types_on_closure_parameters: false
+    avoid_unnecessary_containers: true
+    avoid_void_async: true
+    cascade_invocations: false
+    cast_nullable_to_non_nullable: true
+    combinators_ordering: true
+    directives_ordering: true
+    leading_newlines_in_multiline_strings: true
+    parameter_assignments: true
+    prefer_expression_function_bodies: true
+    prefer_final_in_for_each: true
+    prefer_final_locals: true
+    prefer_if_elements_to_conditional_expressions: true
+    require_trailing_commas: true
+    type_annotate_public_apis: true
+    unnecessary_await_in_return: true
+    unnecessary_breaks: true
+    unnecessary_lambdas: true
+    unnecessary_parenthesis: true
+    unnecessary_raw_strings: true
+    unnecessary_to_list_in_spreads: true
+    use_colored_box: true
+    use_decorated_box: true
+    use_enums: true
+    use_if_null_to_convert_nulls_to_bools: true
+    use_is_even_rather_than_modulo: true
+    use_named_constants: true
+    use_setters_to_change_properties: false
+    use_string_buffers: true
+    use_string_in_part_of_directives: true
+    use_to_and_as_if_applicable: true
+    sort_pub_dependencies: true
+    always_specify_types: true
+    camel_case_types: true
+    camel_case_extensions: true
+    no_runtimeType_toString: true
+    only_throw_errors: true
+    prefer_collection_literals: true
+    prefer_conditional_assignment: true
+    prefer_const_constructors_in_immutables: true
+    prefer_const_declarations: true
+    prefer_final_fields: true
+    prefer_function_declarations_over_variables: true
+    prefer_is_empty: true
+    prefer_is_not_empty: true
+    prefer_is_not_operator: true
+    prefer_typing_uninitialized_variables: true
+    sort_child_properties_last: true
+    use_rethrow_when_possible: true
