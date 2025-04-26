@@ -2,7 +2,8 @@
 
 *A thin yet powerful, **zero‑reflection** SQLite layer for Dart & Flutter.*
 
-![sql_engine banner](https://raw.githubusercontent.com/<your‑org>/sql_engine/main/docs/images/banner.png "sql_engine banner")
+![sql_engine banner](assets/banner.png)
+
 
 ---
 
