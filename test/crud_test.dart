@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sql_engine/sql_engine.dart';
 
@@ -82,7 +80,6 @@ Future<void> createSampleData(SqlEngineDatabase db) async {
 
 void main() {
   late SqlEngineDatabase database;
-  late Directory testDirectory;
 
   setUpAll(() async {
     // testDirectory = Directory.systemTemp.createTempSync();
@@ -120,7 +117,7 @@ void main() {
   });
 
   test('Group By + Count', () async {
-    final result = await database.runSql('''
+    final dynamic result = await database.runSql('''
       SELECT customer_id, COUNT(*) as orderCount
       FROM orders
       GROUP BY customer_id
@@ -131,7 +128,7 @@ void main() {
   });
 
   test('Having + Sum', () async {
-    final result = await database.runSql(
+    final dynamic result = await database.runSql(
       '''
       SELECT customer_id, SUM(total) as totalSpent
       FROM orders
@@ -169,7 +166,7 @@ void main() {
   });
 
   test('Window Function AVG per customer', () async {
-    final result = await database.runSql('''
+    final dynamic result = await database.runSql('''
       SELECT customer_id, total,
         AVG(total) OVER (PARTITION BY customer_id) as avgTotal
       FROM orders
@@ -180,7 +177,7 @@ void main() {
   });
 
   test('Subquery with EXISTS', () async {
-    final result = await database.runSql(
+    final dynamic result = await database.runSql(
       '''
       SELECT * FROM users u
       WHERE EXISTS (

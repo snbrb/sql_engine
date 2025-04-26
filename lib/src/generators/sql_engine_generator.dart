@@ -27,7 +27,7 @@ class SqlEngineGenerator extends GeneratorForAnnotation<SqlTable> {
     final ClassElement classElement = element;
     final String className = classElement.name;
     final String tableName = annotation.read('tableName').stringValue;
-    final int version = annotation.read('version').intValue;
+    //final int version = annotation.read('version').intValue;
 
     // 2) Get all schema versions.
     final List<SqlSchema> schemas = extractSqlSchemas(classElement);

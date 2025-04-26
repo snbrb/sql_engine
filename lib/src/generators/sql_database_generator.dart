@@ -45,5 +45,5 @@ class SqlDatabaseGenerator extends GeneratorForAnnotation<SqlDatabase> {
     );
   }
 
-  String _toCamel(String input) => input[0].toLowerCase() + input.substring(1);
+  //String _toCamel(String input) => input[0].toLowerCase() + input.substring(1);
 }

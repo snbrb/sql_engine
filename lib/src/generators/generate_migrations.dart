@@ -17,7 +17,7 @@ List<SqlEngineMigration> generateMigrations(
 
     final int version = to.version;
     final List<String> up = <String>[];
-    final List<String> down = <String>[];
+    //final List<String> down = <String>[];
 
     final Map<String, SqlColumn> oldCols = <String, SqlColumn>{
       for (final SqlColumn col in from.columns) col.name: col,

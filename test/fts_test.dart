@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sql_engine/sql_engine.dart';
 
@@ -9,7 +7,6 @@ import 'models/user.dart';
 
 void main() {
   late SqlEngineDatabase database;
-  late Directory testDirectory;
 
   setUpAll(() async {
     // testDirectory = Directory.systemTemp.createTempSync();

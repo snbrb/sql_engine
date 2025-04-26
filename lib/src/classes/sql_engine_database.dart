@@ -1,6 +1,5 @@
-import 'dart:io';
-
 //import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
 import 'package:sqlite3/common.dart';
 
 import '../config.dart';
@@ -11,7 +10,7 @@ import '../utils/db_utils.dart';
 import './sql_engine_migration.dart';
 import 'sql_engine_table.dart';
 
-late final SqliteDriverFactory _driverFactory = getDriverFactory();
+final SqliteDriverFactory _driverFactory = getDriverFactory();
 
 class SqlEngineDatabase {
   // db path
@@ -24,7 +23,6 @@ class SqlEngineDatabase {
   final JournalMode mode;
   CommonDatabase? _db;
   // all tables in my project or the one i want to add
-  static final Map<String, String> _tables = <String, String>{};
   final List<SqlEngineTable> _tableObjects = <SqlEngineTable>[];
   // constructor
   SqlEngineDatabase({
@@ -61,7 +59,6 @@ class SqlEngineDatabase {
       return;
     }
 
-    final File file = File(dbPath);
     final bool isFreshDb = isNewDatabase(dbPath);
 
     _db = await _driverFactory.open(dbPath);
@@ -77,7 +74,7 @@ class SqlEngineDatabase {
       final Row row = database.select('PRAGMA user_version').first;
       final int currentVersion = row['user_version'] as int;
       if (enableLog) {
-        print(' Current DB Version: $currentVersion (Target: $version)');
+        debugPrint(' Current DB Version: $currentVersion (Target: $version)');
       }
       //e.g user create db object with version 2 and current version is 1
       if (currentVersion < version) {
@@ -88,7 +85,7 @@ class SqlEngineDatabase {
 
   Future<void> _onCreate() async {
     if (enableLog) {
-      print(' Running _onCreate() - Creating migrations table');
+      debugPrint(' Running _onCreate() - Creating migrations table');
     }
     database.execute('PRAGMA journal_mode = $mode');
     // Ensure the `_migrations` table exists
@@ -128,7 +125,7 @@ class SqlEngineDatabase {
       );
     }
 
-    print(' Tables and migrations initialized.');
+    debugPrint(' Tables and migrations initialized.');
   }
 
   Future<void> _applyMigrations(int fromVersion, int toVersion) async {
@@ -216,7 +213,7 @@ class SqlEngineDatabase {
   ]) async {
     try {
       if (enableLog) {
-        print('[SQL] $sql\nParameters: $parameters');
+        debugPrint('[SQL] $sql\nParameters: $parameters');
       }
       return _db!.select(sql, parameters);
     } catch (e) {
@@ -274,9 +271,9 @@ class SqlEngineDatabase {
 
       // Log the query if logging is enabled
       if (enableLog) {
-        print('[SQL] $sql');
+        debugPrint('[SQL] $sql');
         if (positionalParams.isNotEmpty) {
-          print('Parameters: $positionalParams');
+          debugPrint('Parameters: $positionalParams');
         }
       }
 
@@ -359,21 +356,6 @@ class SqlEngineDatabase {
     return result;
   }
 
-  String _convertSnakeCaseToCamelCase(String input) {
-    final List<String> parts = input.split('_');
-    if (parts.length == 1) {
-      return input;
-    }
-
-    String result = parts[0];
-    for (int i = 1; i < parts.length; i++) {
-      if (parts[i].isNotEmpty) {
-        result += parts[i][0].toUpperCase() + parts[i].substring(1);
-      }
-    }
-    return result;
-  }
-
   void createFTSTable({
     required String tableName,
     required List<String> columns,
@@ -384,7 +366,7 @@ class SqlEngineDatabase {
   }) {
     final String columnList = columns.join(', ');
 
-    final List<String> options = [];
+    final List<String> options = <String>[];
 
     if (externalContentTable != null) {
       options.add("content='$externalContentTable'");
@@ -408,7 +390,7 @@ class SqlEngineDatabase {
   ''';
 
     if (enableLog) {
-      print('[SQL][FTS5] $sql');
+      debugPrint('[SQL][FTS5] $sql');
     }
     database.execute(sql);
   }
