@@ -1,3 +1,3 @@
-## 1.0.0
-- Initial release.
+## 1.0.1
+- Updated typo.
 - Raw SQL support, schema annotations, migrations, model mapping.

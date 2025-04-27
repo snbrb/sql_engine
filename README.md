@@ -1,6 +1,6 @@
 # 🧠 sql_engine
 
-*A thin yet powerful, **zero‑reflection** SQLite layer for Dart & Flutter.*
+*A thin yet powerful SQLite layer for Dart & Flutter.*
 
 ![sql_engine banner](assets/banner.png)
 
@@ -9,7 +9,7 @@
 
 ## ✨ Key features
 
-- **Raw SQL freedom** – run any statement you like (`JOIN`, `UPSERT`, CTEs, FTS5…).
+- **Raw SQL freedom** – run any statement you like (`JOIN`, `UPSERT`, FTS5…).
 - **Schema annotations** – use `@SqlTable` + `@SqlSchema` to generate  
   `CREATE TABLE` scripts *and* versioned migrations automatically.
 - **Two setup styles**
@@ -190,7 +190,7 @@ await db.transaction(() async {
 
 ## 🔍 Related terms
 
-SQL, SQLite, FTS5, UPSERT, JOIN, CTE, WAL, migration, schema, Dart ORM.
+SQL, SQLite, FTS5, UPSERT, JOIN, WAL, migration, schema, Dart ORM.
 
 ## 🤝 Contributing & roadmap
 
