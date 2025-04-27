@@ -2,7 +2,7 @@
 
 *A thin yet powerful SQLite layer for Dart & Flutter.*
 
-![sql_engine banner](assets/banner.png)
+![sql_engine banner](assets/banner01.png)
 
 
 ---
