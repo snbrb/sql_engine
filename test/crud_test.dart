@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sql_engine/sql_engine.dart';
 
@@ -158,7 +160,7 @@ void main() {
     );
 
     print('UPSERT RESULT: $result');
-    final verify = await database.runSql(
+    final dynamic verify = await database.runSql(
       'SELECT * FROM users WHERE id = ?',
       positionalParams: <Object?>[3],
     );

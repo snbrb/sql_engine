@@ -6,6 +6,7 @@ import '../../sql_engine.dart';
 
 /// Extract all `SqlSchema` annotations from the given [element].
 /// Returns a sorted list of schemas by ascending version.
+// ignore: deprecated_member_use
 List<SqlSchema> extractSqlSchemas(ClassElement element) {
   // Prepare a list to collect all matching SqlSchema annotations
   final List<ConstantReader> schemaReaders = <ConstantReader>[];

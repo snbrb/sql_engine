@@ -8,7 +8,7 @@ void main() {
 
   setUpAll(() async {
     database = SqlEngineDatabase(version: 2);
-    database.registerTable([
+    database.registerTable(<SqlEngineTable>[
       const UserMgTable(), // 👈 new table
     ]);
     await database.open(); // will run createTable (fresh) OR migrate (v1→v2)

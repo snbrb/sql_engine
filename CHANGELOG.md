@@ -1,3 +1,3 @@
-## 1.0.2
-- Updated publisher.
-- Raw SQL support, schema annotations, migrations, model mapping.
+## 1.0.3
+- Fix analysis error.
+- Added license

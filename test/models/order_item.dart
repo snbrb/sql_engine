@@ -5,7 +5,7 @@ part 'order_item.g.dart';
 @SqlTable(tableName: 'order_items', version: 1)
 @SqlSchema(
   version: 1,
-  columns: [
+  columns: <SqlColumn>[
     SqlColumn(
       name: 'id',
       type: 'INTEGER',
@@ -33,10 +33,10 @@ class OrderItem {
   final double price;
 
   const OrderItem({
-    this.id,
     required this.orderId,
     required this.productName,
     required this.quantity,
     required this.price,
+    this.id,
   });
 }

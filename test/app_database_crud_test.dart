@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sql_engine/sql_engine.dart';
 
@@ -89,7 +91,7 @@ void main() {
   });
 
   test('Join: users + orders + order_items', () async {
-    final result = await database.runSql(
+    final dynamic result = await database.runSql(
       '''
       SELECT users.name, orders.total, order_items.product_name
       FROM users
@@ -97,7 +99,7 @@ void main() {
       INNER JOIN order_items ON orders.id = order_items.order_id
       WHERE users.id = ?
     ''',
-      positionalParams: [1],
+      positionalParams: <Object?>[1],
     );
 
     print('JOIN RESULT: $result');
@@ -105,7 +107,7 @@ void main() {
   });
 
   test('Having + Sum', () async {
-    final result = await database.runSql(
+    final dynamic result = await database.runSql(
       '''
       SELECT customer_id, SUM(total) as totalSpent
       FROM orders
@@ -135,7 +137,7 @@ void main() {
     );
 
     print('UPSERT RESULT: $result');
-    final verify = await database.runSql(
+    final dynamic verify = await database.runSql(
       'SELECT * FROM users WHERE id = ?',
       positionalParams: <Object?>[3],
     );
@@ -143,7 +145,7 @@ void main() {
   });
 
   test('Window Function AVG per customer', () async {
-    final result = await database.runSql('''
+    final dynamic result = await database.runSql('''
       SELECT customer_id, total,
         AVG(total) OVER (PARTITION BY customer_id) as avgTotal
       FROM orders
@@ -154,7 +156,7 @@ void main() {
   });
 
   test('Subquery with EXISTS', () async {
-    final result = await database.runSql(
+    final dynamic result = await database.runSql(
       '''
       SELECT * FROM users u
       WHERE EXISTS (

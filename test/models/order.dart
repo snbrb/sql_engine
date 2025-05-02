@@ -31,9 +31,9 @@ class Order {
   final double total;
 
   const Order({
-    this.id,
     required this.customerId,
     required this.orderDate,
     required this.total,
+    this.id,
   });
 }

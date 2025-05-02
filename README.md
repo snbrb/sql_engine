@@ -207,3 +207,8 @@ See CONTRIBUTING.md for details.
 
 - File an issue on the GitHub tracker
 - Any direct suggestions are welcome bilalrabbi@gmail.com
+
+
+## 🙏 Acknowledgments
+
+I would like to express my sincere gratitude to my mentor [skn3](https://github.com/skn3) for their incredible support and guidance throughout the development of this package. Their expertise, patience, and encouragement have been invaluable in bringing sql_engine to life. This is just one of many projects where their mentorship has made all the difference, and I look forward to many more collaborations to come.
