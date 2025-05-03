@@ -19,6 +19,7 @@ part 'user.g.dart';
     SqlColumn(name: 'data', type: 'BLOB', nullable: true), // optional blob
   ],
 )
+@SqlIndex(name: 'idx_user_name', columns: <String>['name'])
 class User {
   final int? id;
   final String name;
