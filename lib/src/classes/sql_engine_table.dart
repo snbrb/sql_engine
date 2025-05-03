@@ -5,6 +5,8 @@ abstract class SqlEngineTable {
   /// Full history of CREATE TABLE scripts – must include *every* version.
   Map<int, String> get createTableHistory => <int, String>{};
 
+  List<String> get createIndexes => <String>[];
+
   /// Latest version’s script (handy for ad‑hoc use).
   String get createTable => createTableHistory[createTableHistory.keys.last]!;
 

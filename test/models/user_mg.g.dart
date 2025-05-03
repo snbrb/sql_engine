@@ -29,6 +29,9 @@ class UserMgTable extends SqlEngineTable {
   };
 
   @override
+  List<String> get createIndexes => [];
+
+  @override
   String get createTable => r"""CREATE TABLE user_mg (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   full_name TEXT NOT NULL,

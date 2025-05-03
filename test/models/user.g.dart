@@ -26,6 +26,11 @@ class UserTable extends SqlEngineTable {
   };
 
   @override
+  List<String> get createIndexes => [
+    r"""CREATE INDEX idx_user_name ON users (name);""",
+  ];
+
+  @override
   String get createTable => r"""CREATE TABLE users (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   name TEXT NOT NULL,

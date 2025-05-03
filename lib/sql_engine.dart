@@ -1,5 +1,6 @@
 export 'src/annotations/sql_column.dart';
 export 'src/annotations/sql_database.dart';
+export 'src/annotations/sql_index.dart';
 export 'src/annotations/sql_schema.dart';
 export 'src/annotations/sql_table.dart';
 export 'src/classes/sql_engine_database.dart';

@@ -99,14 +99,21 @@ class SqlEngineDatabase {
     );
   ''');
 
-    // Create tables from registered models
-    // for (final MapEntry<String, String> entry in _tables.entries) {
-    //   database.execute(entry.value);
-    // }
+    // 2. Create all tables
 
     for (final SqlEngineTable tbl in _tableObjects) {
       final String ddl = tbl.createSqlFor(version); // ← use target version
       database.execute(ddl);
+    }
+
+    // 3. Run CREATE INDEX statements
+    for (final SqlEngineTable tbl in _tableObjects) {
+      for (final String createIndex in tbl.createIndexes) {
+        if (enableLog) {
+          print('Creating index for ${tbl.tableName}: $createIndex');
+        }
+        database.execute(createIndex);
+      }
     }
 
     // Set the database version to match the provided `version`

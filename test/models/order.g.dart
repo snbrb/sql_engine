@@ -25,6 +25,9 @@ class OrderTable extends SqlEngineTable {
   };
 
   @override
+  List<String> get createIndexes => [];
+
+  @override
   String get createTable => r"""CREATE TABLE orders (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   customer_id INTEGER NOT NULL REFERENCES users(id),

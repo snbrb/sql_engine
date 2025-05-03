@@ -71,9 +71,38 @@ class User {
 }
 ```
 
+
+### 1.2 Define a model with index
+
+```dart
+import 'package:sql_engine/sql_engine.dart';
+
+part 'user.g.dart';
+
+@SqlTable(tableName: 'users', version: 1)
+@SqlIndex(name: 'idx_user_email', columns: ['email'])
+
+@SqlSchema(
+  version: 1,
+  columns: [
+    SqlColumn(name: 'id', type: 'INTEGER', primaryKey: true, autoincrement: true, nullable: false),
+    SqlColumn(name: 'email', type: 'TEXT', nullable: false),
+    SqlColumn(name: 'created_at', type: 'DATETIME'),
+  ],
+)
+class User {
+  final int? id;
+  final String email;
+  final DateTime? createdAt;
+
+  User({this.id, required this.email, this.createdAt});
+}
+```
+
 Run the generator. You'll get user.g.dart with:
 - UserTable (DDL + migrations)
 - UserMapper.fromRow / toRow
+- createIndexes override to register all @SqlIndex definitions
 
 ### 2A. Manual database (explicit)
 

@@ -5,8 +5,11 @@ import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 
 import '../../sql_engine.dart';
+import '../annotations/sql_index.dart';
 import 'extract_sql_create_table_query.dart';
+import 'extract_sql_indexes.dart';
 import 'extract_sql_schema.dart';
+import 'generate_index_statement.dart';
 import 'generate_migrations.dart';
 import 'generate_sql_engine_table_class.dart';
 
@@ -52,6 +55,13 @@ class SqlEngineGenerator extends GeneratorForAnnotation<SqlTable> {
 
     final List<SqlColumn> columns = latest.columns;
 
+    // handle indexes
+    final List<SqlIndex> indexes = extractSqlIndexes(classElement);
+    final List<String> createIndexes = generateIndexStatements(
+      tableName,
+      indexes,
+    );
+
     // 4) Generate Dart class with SQL string
 
     final String output = generateSqlEngineTableClass(
@@ -61,6 +71,7 @@ class SqlEngineGenerator extends GeneratorForAnnotation<SqlTable> {
       migrations: migrations,
       columns: columns,
       schemas: schemas,
+      createIndexes: createIndexes,
     );
 
     return output;

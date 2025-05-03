@@ -10,6 +10,7 @@ String generateSqlEngineTableClass({
   required List<SqlEngineMigration> migrations,
   required List<SqlColumn> columns,
   required List<SqlSchema> schemas,
+  List<String> createIndexes = const <String>[],
 }) {
   //
   final String migrationCode = generateMigrationCode(migrations);
@@ -18,6 +19,11 @@ String generateSqlEngineTableClass({
     originalClassName,
     columns,
   );
+
+  //create indexSql for indexes
+  final String indexSql = createIndexes
+      .map((String e) => 'r"""$e"""')
+      .join(',\n    ');
 
   final String historyEntries =
       schemas.map((SqlSchema s) {
@@ -35,6 +41,12 @@ class ${originalClassName}Table extends SqlEngineTable {
   Map<int, String> get createTableHistory => {
     $historyEntries
   };
+
+
+  @override
+  List<String> get createIndexes => [
+    $indexSql
+  ];
 
 
   @override

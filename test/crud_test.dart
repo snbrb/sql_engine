@@ -346,4 +346,34 @@ void main() {
 
     expect(users, isNotEmpty);
   });
+  test('Index "idx_user_name" is created', () async {
+    final List<Map<String, dynamic>> indexes = await database.queryRaw(
+      "PRAGMA index_list('users')",
+    );
+
+    print('Indexes on users table: $indexes');
+
+    final bool hasNameIndex = indexes.any(
+      (Map<String, dynamic> row) => row['name'] == 'idx_user_name',
+    );
+
+    expect(hasNameIndex, isTrue);
+  });
+
+  test('Index is used when filtering by name', () async {
+    final List<Map<String, dynamic>> plan = await database.queryRaw(
+      'EXPLAIN QUERY PLAN SELECT * FROM users WHERE name = ?',
+      <Object?>['Jane Smith'],
+    );
+
+    print('EXPLAIN QUERY PLAN: $plan');
+
+    final bool usesIndex = plan.any(
+      (Map<String, dynamic> row) => row.values.any(
+        (dynamic v) => v.toString().toLowerCase().contains('using index'),
+      ),
+    );
+
+    expect(usesIndex, isTrue);
+  });
 }
