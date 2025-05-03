@@ -1,17 +1,28 @@
-## [1.0.4] - 2025-05-03
+## [1.0.5] – 2025‑05‑03
+
+### Fixed
+* **Mapper code‑gen**
+  * Removed illegal trailing `?` in `toRow()` for nullable fields (e.g. now emits  
+    `'locationLat': locationLat,` instead of `'locationLat': locationLat?,`).
+  * Null‑safe write for `DateTime` (`createdAt?.millisecondsSinceEpoch`) and for `bool`
+    (`male == true ? 1 : null`).
 
 ### Added
-- Introduced `@SqlIndex` annotation for defining named indexes on tables.
-- Generator now reads and embeds indexes as part of the generated table class.
-- Database applies all defined indexes automatically during `open()` on initial creation.
-- Added `createIndexes` override in `SqlEngineTable` to allow per-table index registration.
-- Added test support:
-  - Verify index creation using `PRAGMA index_list`.
-  - Verify index usage via `EXPLAIN QUERY PLAN`.
+* **`@SqlIndex` annotation**
+  * Define one or more indexes per table.  
+    ```dart
+    @SqlIndex(name: 'idx_user_email', columns: ['email'])
+    ```
+  * Generator now outputs a `createIndexes` list inside each `*Table` class.
+  * `_onCreate()` automatically executes all `CREATE INDEX` statements after tables
+    are created.
 
-### Example usage
+### Tests
+* New tests verify:
+  * Index is present (`PRAGMA index_list`)
+  * Index is used (`EXPLAIN QUERY PLAN … USING INDEX`)
 
-```dart
-@SqlTable(tableName: 'users', version: 1)
-@SqlIndex(name: 'idx_user_name', columns: ['name'])
-class User { ... }
+### Migration
+No breaking API changes. Re‑run `build_runner` to regenerate code and
+indexes will be created automatically the next time the database is
+initialized.

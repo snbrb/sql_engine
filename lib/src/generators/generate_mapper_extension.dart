@@ -11,7 +11,7 @@ String generateMapperExtension(String className, List<SqlColumn> columns) {
     final String dartType = StringUtils.inferDartType(col);
     final bool nullable = col.nullable;
 
-    // === FROM ROW ===
+    /* ---------- FROM‑ROW section ---------- */
     if (dartType == 'bool') {
       final String read =
           nullable
@@ -27,7 +27,9 @@ String generateMapperExtension(String className, List<SqlColumn> columns) {
     if (dartType == 'DateTime') {
       final String read =
           nullable
-              ? "row.containsKey('$name') && row['$name'] != null ? DateTime.fromMillisecondsSinceEpoch(row['$name'] as int) : null"
+              ? "row.containsKey('$name') && row['$name'] != null "
+                  "? DateTime.fromMillisecondsSinceEpoch(row['$name'] as int) "
+                  ': null'
               : "DateTime.fromMillisecondsSinceEpoch(row['$name'] as int)";
       final String write =
           nullable
@@ -41,34 +43,33 @@ String generateMapperExtension(String className, List<SqlColumn> columns) {
     if (dartType == 'double') {
       final String read =
           nullable
-              ? "row.containsKey('$name') && row['$name'] != null ? (row['$name'] as num).toDouble() : null"
+              ? "row.containsKey('$name') && row['$name'] != null "
+                  "? (row['$name'] as num).toDouble() "
+                  ": null"
               : "(row['$name'] as num).toDouble()";
-      final String write = nullable ? '$dartKey?' : dartKey;
       fromBuffer.writeln('      $dartKey: $read,');
-      toBuffer.writeln("      '$name': $write,");
+      toBuffer.writeln("      '$name': $dartKey,"); // <- no trailing ?
       continue;
     }
 
     if (dartType == 'List<int>') {
       final String read =
           nullable ? "row['$name'] as List<int>?" : "row['$name'] as List<int>";
-      final String write = nullable ? dartKey : dartKey;
-
       fromBuffer.writeln('      $dartKey: $read,');
-      toBuffer.writeln("      '$name': $write,");
+      toBuffer.writeln("      '$name': $dartKey,");
       continue;
     }
 
-    // Fallback: int, String, etc.
+    // fallback: int, String, etc.
     final String read =
         nullable
             ? "row.containsKey('$name') ? row['$name'] as $dartType? : null"
             : "row['$name'] as $dartType";
-    final String write = nullable ? dartKey : dartKey;
     fromBuffer.writeln('      $dartKey: $read,');
-    toBuffer.writeln("      '$name': $write,");
+    toBuffer.writeln("      '$name': $dartKey,");
   }
 
+  /* ---------- assemble extension ---------- */
   return '''
 extension ${className}Mapper on $className {
   static $className fromRow(Map<String, dynamic> row) {
