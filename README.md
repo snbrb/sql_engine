@@ -107,7 +107,7 @@ Run the generator. You'll get user.g.dart with:
 ### 2A. Manual database (explicit)
 
 ```dart
-final db = SqlEngineDatabase();
+final db = SqlEngineDatabase(); // enableLog
 
 db.registerTable([
   const UserTable(),       // generated class

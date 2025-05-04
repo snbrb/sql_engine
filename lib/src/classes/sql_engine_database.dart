@@ -3,7 +3,6 @@
 
 import 'package:sqlite3/common.dart';
 
-import '../config.dart';
 import '../drivers/sqlite_driver_factory.dart';
 import '../enums/journal_mode.dart';
 import '../exceptions.dart';
@@ -22,6 +21,9 @@ class SqlEngineDatabase {
   final List<SqlEngineMigration> migrations;
   // journnal mode
   final JournalMode mode;
+  // enable logs for print
+  final bool enableLog;
+
   CommonDatabase? _db;
   // all tables in my project or the one i want to add
   final List<SqlEngineTable> _tableObjects = <SqlEngineTable>[];
@@ -29,6 +31,7 @@ class SqlEngineDatabase {
   SqlEngineDatabase({
     this.dbPath = ':memory:',
     this.version = 1,
+    this.enableLog = true,
     this.migrations = const <SqlEngineMigration>[],
     this.mode = JournalMode.delete,
   });
@@ -132,8 +135,9 @@ class SqlEngineDatabase {
         <Object?>[DateTime.now().millisecondsSinceEpoch],
       );
     }
-
-    print(' Tables and migrations initialized.');
+    if (enableLog) {
+      print(' Tables and migrations initialized.');
+    }
   }
 
   Future<void> _applyMigrations(int fromVersion, int toVersion) async {

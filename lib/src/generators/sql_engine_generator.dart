@@ -5,7 +5,7 @@ import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 
 import '../../sql_engine.dart';
-import '../annotations/sql_index.dart';
+
 import 'extract_sql_create_table_query.dart';
 import 'extract_sql_indexes.dart';
 import 'extract_sql_schema.dart';

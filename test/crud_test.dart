@@ -89,7 +89,7 @@ void main() {
     //
     // if (File(dbPath).existsSync()) File(dbPath).deleteSync();
 
-    database = SqlEngineDatabase();
+    database = SqlEngineDatabase(enableLog: false);
 
     database.registerTable(<SqlEngineTable>[
       const UserTable(),
