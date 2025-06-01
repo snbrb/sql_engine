@@ -23,7 +23,6 @@ class StringUtils {
       case SqlType.blob:
         return 'List<int>';
       case SqlType.text:
-      default:
         return 'String';
     }
   }
