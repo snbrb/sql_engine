@@ -1,14 +1,11 @@
-import 'dart:developer';
-
 import '../../sql_engine.dart';
 
-/// Build a SQL `CREATE TABLE` statement from schema
 String extractSqlCreateTableQuery(String tableName, SqlSchema schema) {
   final List<String> columnDefs = <String>[];
-  log(schema.columns.toString());
+
   for (final SqlColumn col in schema.columns) {
     final StringBuffer buffer =
-        StringBuffer()..write('${col.name} ${col.type ?? 'TEXT'}');
+        StringBuffer()..write('${col.name} ${col.type.sqlName}');
 
     if (col.primaryKey) {
       buffer.write(' PRIMARY KEY');
@@ -32,18 +29,29 @@ String extractSqlCreateTableQuery(String tableName, SqlSchema schema) {
     columnDefs.add(buffer.toString());
   }
 
-  final String result = '''
+  return '''
 CREATE TABLE $tableName (
   ${columnDefs.join(',\n  ')}
 );
 ''';
-
-  return result;
 }
 
 String formatSqlDefault(Object? value) {
-  if (value is String) {
-    return "'$value'";
+  if (value == null) {
+    return 'NULL';
   }
-  return value.toString();
+
+  if (value is String) {
+    return "'${value.replaceAll("'", "''")}'"; // escape single quotes
+  }
+
+  if (value is bool) {
+    return value ? '1' : '0'; // SQLite uses 1/0 for booleans
+  }
+
+  if (value is DateTime) {
+    return "'${value.toIso8601String()}'";
+  }
+
+  return value.toString(); // int, double, etc.
 }

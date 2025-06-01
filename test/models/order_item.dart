@@ -8,21 +8,21 @@ part 'order_item.g.dart';
   columns: <SqlColumn>[
     SqlColumn(
       name: 'id',
-      type: 'INTEGER',
+      type: SqlType.integer,
       primaryKey: true,
       autoincrement: true,
       nullable: false,
     ),
     SqlColumn(
       name: 'order_id',
-      type: 'INTEGER',
+      type: SqlType.integer,
       references: 'orders',
       referenceColumn: 'id',
       nullable: false,
     ),
-    SqlColumn(name: 'product_name', type: 'TEXT', nullable: false),
-    SqlColumn(name: 'quantity', type: 'INTEGER', nullable: false),
-    SqlColumn(name: 'price', type: 'REAL', nullable: false),
+    SqlColumn(name: 'product_name', type: SqlType.text, nullable: false),
+    SqlColumn(name: 'quantity', type: SqlType.integer, nullable: false),
+    SqlColumn(name: 'price', type: SqlType.real, nullable: false),
   ],
 )
 class OrderItem {

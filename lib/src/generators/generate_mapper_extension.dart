@@ -24,12 +24,12 @@ String generateMapperExtension(String className, List<SqlColumn> columns) {
       continue;
     }
 
-    if (dartType == 'DateTime') {
+    if (col.type == SqlType.date) {
       final String read =
           nullable
               ? "row.containsKey('$name') && row['$name'] != null "
                   "? DateTime.fromMillisecondsSinceEpoch(row['$name'] as int) "
-                  ': null'
+                  ": null"
               : "DateTime.fromMillisecondsSinceEpoch(row['$name'] as int)";
       final String write =
           nullable

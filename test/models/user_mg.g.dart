@@ -16,14 +16,14 @@ class UserMgTable extends SqlEngineTable {
   @override
   Map<int, String> get createTableHistory => {
     1: r"""CREATE TABLE user_mg (
-  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-  name TEXT NOT NULL
+  id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+  name text NOT NULL
 );
 """,
     2: r"""CREATE TABLE user_mg (
-  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-  full_name TEXT NOT NULL,
-  email TEXT
+  id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+  full_name text NOT NULL,
+  email text
 );
 """,
   };
@@ -33,9 +33,9 @@ class UserMgTable extends SqlEngineTable {
 
   @override
   String get createTable => r"""CREATE TABLE user_mg (
-  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-  full_name TEXT NOT NULL,
-  email TEXT
+  id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+  full_name text NOT NULL,
+  email text
 );
 """;
 
@@ -43,7 +43,7 @@ class UserMgTable extends SqlEngineTable {
     const SqlEngineMigration(
       version: 2,
       up: r"""ALTER TABLE user_mg RENAME COLUMN name TO full_name;
-ALTER TABLE user_mg ADD COLUMN email TEXT;""",
+ALTER TABLE user_mg ADD COLUMN email text;""",
       down: r"""-- Down migration for version 2 not implemented.""",
       description: 'Upgrade user_mg to version 2',
     ),

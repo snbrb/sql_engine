@@ -45,7 +45,7 @@ List<SqlEngineMigration> generateMigrations(
       if (!alreadyExists) {
         final StringBuffer sb = StringBuffer();
         sb.write(
-          'ALTER TABLE $tableName ADD COLUMN ${col.name} ${col.type ?? 'TEXT'}',
+          'ALTER TABLE $tableName ADD COLUMN ${col.name} ${col.type.sqlName}',
         );
 
         if (!col.nullable) {

@@ -13,12 +13,12 @@ part 'user_mg.g.dart';
   columns: <SqlColumn>[
     SqlColumn(
       name: 'id',
-      type: 'INTEGER',
+      type: SqlType.integer,
       primaryKey: true,
       autoincrement: true,
       nullable: false,
     ),
-    SqlColumn(name: 'name', type: 'TEXT', nullable: false),
+    SqlColumn(name: 'name', type: SqlType.text, nullable: false),
   ],
 )
 /// ── Version 2 ────────────────────────────────
@@ -28,7 +28,7 @@ part 'user_mg.g.dart';
     // ➊ same PK
     SqlColumn(
       name: 'id',
-      type: 'INTEGER',
+      type: SqlType.integer,
       primaryKey: true,
       autoincrement: true,
       nullable: false,
@@ -36,12 +36,12 @@ part 'user_mg.g.dart';
     // ➋ renamed column
     SqlColumn(
       name: 'full_name',
-      type: 'TEXT',
+      type: SqlType.text,
       nullable: false,
       renamedFrom: 'name',
     ),
     // ➌ brand‑new column
-    SqlColumn(name: 'email', type: 'TEXT', nullable: true),
+    SqlColumn(name: 'email', type: SqlType.text, nullable: true),
   ],
 )
 class UserMg extends UserMgTable {

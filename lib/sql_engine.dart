@@ -7,4 +7,5 @@ export 'src/classes/sql_engine_database.dart';
 export 'src/classes/sql_engine_migration.dart';
 export 'src/classes/sql_engine_table.dart';
 export 'src/enums/journal_mode.dart';
+export 'src/enums/sql_type.dart';
 export 'src/exceptions.dart';

@@ -8,20 +8,20 @@ part 'order.g.dart';
   columns: <SqlColumn>[
     SqlColumn(
       name: 'id',
-      type: 'INTEGER',
+      type: SqlType.integer,
       primaryKey: true,
       autoincrement: true,
       nullable: false,
     ),
     SqlColumn(
       name: 'customer_id',
-      type: 'INTEGER',
+      type: SqlType.integer,
       references: 'users',
       referenceColumn: 'id',
       nullable: false,
     ),
-    SqlColumn(name: 'order_date', type: 'DATETIME', nullable: false),
-    SqlColumn(name: 'total', type: 'REAL', nullable: false),
+    SqlColumn(name: 'order_date', type: SqlType.date, nullable: false),
+    SqlColumn(name: 'total', type: SqlType.real, nullable: false),
   ],
 )
 class Order {

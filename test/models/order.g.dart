@@ -16,10 +16,10 @@ class OrderTable extends SqlEngineTable {
   @override
   Map<int, String> get createTableHistory => {
     1: r"""CREATE TABLE orders (
-  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-  customer_id INTEGER NOT NULL REFERENCES users(id),
-  order_date DATETIME NOT NULL,
-  total REAL NOT NULL
+  id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+  customer_id integer NOT NULL REFERENCES users(id),
+  order_date DATE NOT NULL,
+  total real NOT NULL
 );
 """,
   };
@@ -29,10 +29,10 @@ class OrderTable extends SqlEngineTable {
 
   @override
   String get createTable => r"""CREATE TABLE orders (
-  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-  customer_id INTEGER NOT NULL REFERENCES users(id),
-  order_date DATETIME NOT NULL,
-  total REAL NOT NULL
+  id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+  customer_id integer NOT NULL REFERENCES users(id),
+  order_date DATE NOT NULL,
+  total real NOT NULL
 );
 """;
 

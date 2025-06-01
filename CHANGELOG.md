@@ -1,3 +1,19 @@
+## [2.0.0] - 2025-06-01
+
+### ⚠️ Breaking Changes
+- `SqlColumn.type` is now required to be a `SqlType` enum instead of a string. This improves type safety and autocompletion.
+  - **Before:**
+    ```dart
+    SqlColumn(name: 'id', type: 'INTEGER')
+    ```
+  - **After:**
+    ```dart
+    SqlColumn(name: 'id', type: SqlType.integer)
+    ```
+
+- Code generators have been updated to map `SqlType` to proper SQL keywords in `CREATE TABLE`, `ALTER TABLE`, and index creation.
+
+
 ## [1.0.6] - 2025-05-04
 
 ### Added

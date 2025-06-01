@@ -8,15 +8,23 @@ part 'user.g.dart';
   columns: <SqlColumn>[
     SqlColumn(
       name: 'id',
-      type: 'INTEGER',
+      type: SqlType.integer,
       primaryKey: true,
       autoincrement: true,
       nullable: false,
     ),
-    SqlColumn(name: 'name', type: 'TEXT', nullable: false),
-    SqlColumn(name: 'male', type: 'BOOLEAN', nullable: true), // stored as 0/1
-    SqlColumn(name: 'created_at', type: 'DATETIME', nullable: true),
-    SqlColumn(name: 'data', type: 'BLOB', nullable: true), // optional blob
+    SqlColumn(name: 'name', type: SqlType.text, nullable: false),
+    SqlColumn(
+      name: 'male',
+      type: SqlType.boolean,
+      nullable: true,
+    ), // stored as 0/1
+    SqlColumn(name: 'created_at', type: SqlType.date, nullable: true),
+    SqlColumn(
+      name: 'data',
+      type: SqlType.blob,
+      nullable: true,
+    ), // optional blob
   ],
 )
 @SqlIndex(name: 'idx_user_name', columns: <String>['name'])

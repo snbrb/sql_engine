@@ -16,11 +16,11 @@ class UserTable extends SqlEngineTable {
   @override
   Map<int, String> get createTableHistory => {
     1: r"""CREATE TABLE users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-  name TEXT NOT NULL,
-  male BOOLEAN,
-  created_at DATETIME,
-  data BLOB
+  id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+  name text NOT NULL,
+  male boolean,
+  created_at DATE,
+  data blob
 );
 """,
   };
@@ -32,11 +32,11 @@ class UserTable extends SqlEngineTable {
 
   @override
   String get createTable => r"""CREATE TABLE users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-  name TEXT NOT NULL,
-  male BOOLEAN,
-  created_at DATETIME,
-  data BLOB
+  id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+  name text NOT NULL,
+  male boolean,
+  created_at DATE,
+  data blob
 );
 """;
 

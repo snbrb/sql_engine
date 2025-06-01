@@ -8,15 +8,23 @@ part 'user.g.dart';
   columns: <SqlColumn>[
     SqlColumn(
       name: 'id',
-      type: 'INTEGER',
+      type: SqlType.integer,
       primaryKey: true,
       autoincrement: true,
       nullable: false,
     ),
-    SqlColumn(name: 'name', type: 'TEXT', nullable: false),
-    SqlColumn(name: 'male', type: 'BOOLEAN', nullable: true), // stored as 0/1
-    SqlColumn(name: 'created_at', type: 'DATETIME', nullable: true),
-    SqlColumn(name: 'data', type: 'BLOB', nullable: true), // optional blob
+    SqlColumn(name: 'name', type: SqlType.text, nullable: false),
+    SqlColumn(
+      name: 'male',
+      type: SqlType.boolean,
+      nullable: true,
+    ), // stored as 0/1
+    SqlColumn(name: 'created_at', type: SqlType.date, nullable: true),
+    SqlColumn(
+      name: 'data',
+      type: SqlType.blob,
+      nullable: true,
+    ), // optional blob
   ],
 )
 class User {
@@ -39,15 +47,15 @@ class User {
 //   columns: <SqlColumn>[
 //     SqlColumn(
 //       name: 'id',
-//       type: 'INTEGER',
+//       type: SqlType.integer,
 //       primaryKey: true,
 //       autoincrement: true,
 //       nullable: false,
 //       renamedFrom: null,
 //     ),
-//     SqlColumn(name: 'name', type: 'TEXT', nullable: false),
-//     SqlColumn(name: 'email', type: 'TEXT', unique: true, nullable: false),
-//     SqlColumn(name: 'is_active', type: 'INTEGER', defaultValue: 1),
+//     SqlColumn(name: 'name', type: SqlType.text, nullable: false),
+//     SqlColumn(name: 'email', type: SqlType.text, unique: true, nullable: false),
+//     SqlColumn(name: 'is_active', type: SqlType.integer, defaultValue: 1),
 //   ],
 // )
 // @SqlSchema(
@@ -55,15 +63,15 @@ class User {
 //   columns: <SqlColumn>[
 //     SqlColumn(
 //       name: 'id',
-//       type: 'INTEGER',
+//       type: SqlType.integer,
 //       primaryKey: true,
 //       autoincrement: true,
 //       nullable: false,
 //     ),
-//     SqlColumn(name: 'name', type: 'TEXT', nullable: false),
-//     SqlColumn(name: 'email', type: 'TEXT', unique: true, nullable: false),
-//     SqlColumn(name: 'is_active', type: 'INTEGER', defaultValue: 1),
-//     SqlColumn(name: 'created_at', type: 'TEXT', nullable: false),
+//     SqlColumn(name: 'name', type: SqlType.text, nullable: false),
+//     SqlColumn(name: 'email', type: SqlType.text, unique: true, nullable: false),
+//     SqlColumn(name: 'is_active', type: SqlType.integer, defaultValue: 1),
+//     SqlColumn(name: 'created_at', type: SqlType.text, nullable: false),
 //   ],
 // )
 // @SqlSchema(
@@ -71,23 +79,23 @@ class User {
 //   columns: <SqlColumn>[
 //     SqlColumn(
 //       name: 'id',
-//       type: 'INTEGER',
+//       type: SqlType.integer,
 //       primaryKey: true,
 //       autoincrement: true,
 //       nullable: false,
 //     ),
 //     SqlColumn(
 //       name: 'full_name',
-//       type: 'TEXT',
+//       type: SqlType.text,
 //       nullable: false,
 //       renamedFrom: 'name', // 💡 Add this
 //     ), // renamed from name -> full_name
-//     SqlColumn(name: 'email', type: 'TEXT', unique: true, nullable: false),
-//     SqlColumn(name: 'is_active', type: 'INTEGER', defaultValue: 1),
-//     SqlColumn(name: 'created_at', type: 'TEXT', nullable: false),
-//     SqlColumn(name: 'age', type: 'INTEGER'),
-//     SqlColumn(name: 'balance', type: 'REAL', defaultValue: 0.0),
-//     SqlColumn(name: 'bio', type: 'TEXT'),
+//     SqlColumn(name: 'email', type: SqlType.text, unique: true, nullable: false),
+//     SqlColumn(name: 'is_active', type: SqlType.integer, defaultValue: 1),
+//     SqlColumn(name: 'created_at', type: SqlType.text, nullable: false),
+//     SqlColumn(name: 'age', type: SqlType.integer),
+//     SqlColumn(name: 'balance', type: SqlType.real, defaultValue: 0.0),
+//     SqlColumn(name: 'bio', type: SqlType.text),
 //   ],
 // )
 // class User {

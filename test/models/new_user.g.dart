@@ -16,15 +16,15 @@ class NewUserTable extends SqlEngineTable {
   @override
   Map<int, String> get createTableHistory => {
     1: r"""CREATE TABLE Users (
-  uid TEXT PRIMARY KEY NOT NULL,
-  displayName TEXT NOT NULL,
-  profilePhotoUrl TEXT,
-  locationLat REAL,
-  locationLng REAL,
-  voipToken TEXT,
-  platform TEXT,
-  firebaseToken TEXT,
-  lastUpdated INTEGER
+  uid text PRIMARY KEY NOT NULL,
+  displayName text NOT NULL,
+  profilePhotoUrl text,
+  locationLat real,
+  locationLng real,
+  voipToken text,
+  platform text,
+  firebaseToken text,
+  lastUpdated integer
 );
 """,
   };
@@ -34,15 +34,15 @@ class NewUserTable extends SqlEngineTable {
 
   @override
   String get createTable => r"""CREATE TABLE Users (
-  uid TEXT PRIMARY KEY NOT NULL,
-  displayName TEXT NOT NULL,
-  profilePhotoUrl TEXT,
-  locationLat REAL,
-  locationLng REAL,
-  voipToken TEXT,
-  platform TEXT,
-  firebaseToken TEXT,
-  lastUpdated INTEGER
+  uid text PRIMARY KEY NOT NULL,
+  displayName text NOT NULL,
+  profilePhotoUrl text,
+  locationLat real,
+  locationLng real,
+  voipToken text,
+  platform text,
+  firebaseToken text,
+  lastUpdated integer
 );
 """;
 

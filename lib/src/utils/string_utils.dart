@@ -11,20 +11,18 @@ class StringUtils {
   }
 
   static String inferDartType(SqlColumn col) {
-    final String type = (col.type ?? '').toLowerCase();
-
-    switch (type) {
-      case 'integer':
+    switch (col.type) {
+      case SqlType.integer:
         return 'int';
-      case 'real':
+      case SqlType.real:
         return 'double';
-      case 'boolean':
+      case SqlType.boolean:
         return 'bool';
-      case 'datetime':
+      case SqlType.date:
         return 'DateTime';
-      case 'blob':
+      case SqlType.blob:
         return 'List<int>';
-      case 'text':
+      case SqlType.text:
       default:
         return 'String';
     }

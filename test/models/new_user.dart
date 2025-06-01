@@ -1,4 +1,5 @@
 import 'package:sql_engine/sql_engine.dart';
+import 'package:sql_engine/src/enums/sql_type.dart';
 
 part 'new_user.g.dart';
 
@@ -6,15 +7,20 @@ part 'new_user.g.dart';
 @SqlSchema(
   version: 1,
   columns: <SqlColumn>[
-    SqlColumn(name: 'uid', type: 'TEXT', primaryKey: true, nullable: false),
-    SqlColumn(name: 'displayName', type: 'TEXT', nullable: false),
-    SqlColumn(name: 'profilePhotoUrl', type: 'TEXT', nullable: true),
-    SqlColumn(name: 'locationLat', type: 'REAL', nullable: true),
-    SqlColumn(name: 'locationLng', type: 'REAL', nullable: true),
-    SqlColumn(name: 'voipToken', type: 'TEXT', nullable: true),
-    SqlColumn(name: 'platform', type: 'TEXT', nullable: true),
-    SqlColumn(name: 'firebaseToken', type: 'TEXT', nullable: true),
-    SqlColumn(name: 'lastUpdated', type: 'INTEGER', nullable: true),
+    SqlColumn(
+      name: 'uid',
+      type: SqlType.text,
+      primaryKey: true,
+      nullable: false,
+    ),
+    SqlColumn(name: 'displayName', type: SqlType.text, nullable: false),
+    SqlColumn(name: 'profilePhotoUrl', type: SqlType.text, nullable: true),
+    SqlColumn(name: 'locationLat', type: SqlType.real, nullable: true),
+    SqlColumn(name: 'locationLng', type: SqlType.real, nullable: true),
+    SqlColumn(name: 'voipToken', type: SqlType.text, nullable: true),
+    SqlColumn(name: 'platform', type: SqlType.text, nullable: true),
+    SqlColumn(name: 'firebaseToken', type: SqlType.text, nullable: true),
+    SqlColumn(name: 'lastUpdated', type: SqlType.integer, nullable: true),
   ],
 )
 class NewUser {
