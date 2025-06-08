@@ -316,6 +316,10 @@ class SqlEngineDatabase {
         stmt.dispose();
       }
     } on Exception catch (e) {
+      if (enableLog) {
+        print('Error executing SQL: $sql');
+        print('Parameters: $positionalParams');
+      }
       throw SqlEngineException('Error executing query: $sql', e);
     }
   }

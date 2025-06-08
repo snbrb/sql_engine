@@ -1,3 +1,36 @@
+## [2.0.1] - 2025-06-08
+
+### ✨ Added
+- **Strongly-Typed CRUD Code Generation**  
+  New generator methods now create full CRUD extensions for each model/table:
+  - `insert<Entity>()`
+  - `update<Entity>()`
+  - `upsert<Entity>()`
+  - `delete<Entity>ById()`
+  - `delete<Entity>Where()`
+  - `flush<Entity>s()`
+  - `findAll<Entity>s()`
+  - `find<Entity>sWhere()`
+
+  These methods are emitted as `extension <Entity>Crud on SqlEngineDatabase`, with support for:
+  - Named parameter helpers (`<Entity>CrudHelpers`)
+  - Automatic conversion of `DateTime` → `millisecondsSinceEpoch`
+  - Nullable field safety
+  - Strongly-typed model mapping with `<Entity>Mapper.fromRow`
+
+  #### Example
+  ```dart
+  await User.insert(
+    db,
+    id: 1,
+    name: 'Jane Smith',
+    male: true,
+    createdAt: DateTime.now(),
+  );
+
+  final users = await User.findWhere(db, 'name = ?', 'Jane Smith');
+
+
 ## [2.0.0] - 2025-06-01
 
 ### ⚠️ Breaking Changes

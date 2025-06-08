@@ -92,3 +92,214 @@ extension NewUserMapper on NewUser {
     };
   }
 }
+
+extension NewUserCrud on SqlEngineDatabase {
+  // INSERT ------------------------------------------------------------------
+  Future<void> insertNewUser(NewUser entity) async {
+    await runSql(
+      'INSERT INTO Users (uid, displayName, profilePhotoUrl, locationLat, locationLng, voipToken, platform, firebaseToken, lastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      positionalParams: <Object?>[
+        entity.uid,
+        entity.displayName,
+        entity.profilePhotoUrl,
+        entity.locationLat,
+        entity.locationLng,
+        entity.voipToken,
+        entity.platform,
+        entity.firebaseToken,
+        entity.lastUpdated,
+      ],
+    );
+  }
+
+  // DELETE ------------------------------------------------------------------
+  Future<int> deleteNewUserById(Object? id) async => runSql<int>(
+    'DELETE FROM Users WHERE uid = ?',
+    positionalParams: <Object?>[id],
+  );
+
+  Future<int> deleteNewUserWhere(String field, Object? value) async =>
+      runSql<int>(
+        'DELETE FROM Users WHERE $field = ?',
+        positionalParams: <Object?>[value],
+      );
+
+  Future<int> flushNewUsers() async => runSql<int>('DELETE FROM Users');
+
+  // UPDATE ------------------------------------------------------------------
+  Future<void> updateNewUser(NewUser entity) async {
+    await runSql(
+      'UPDATE Users SET displayName = ?, profilePhotoUrl = ?, locationLat = ?, locationLng = ?, voipToken = ?, platform = ?, firebaseToken = ?, lastUpdated = ? WHERE uid = ?',
+      positionalParams: <Object?>[
+        entity.displayName,
+        entity.profilePhotoUrl,
+        entity.locationLat,
+        entity.locationLng,
+        entity.voipToken,
+        entity.platform,
+        entity.firebaseToken,
+        entity.lastUpdated,
+        entity.uid,
+      ],
+    );
+  }
+
+  // UPSERT ------------------------------------------------------------------
+  Future<void> upsertNewUser(NewUser entity) async {
+    await runSql(
+      'INSERT INTO Users (uid, displayName, profilePhotoUrl, locationLat, locationLng, voipToken, platform, firebaseToken, lastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) '
+      'ON CONFLICT(uid) DO UPDATE SET displayName = ?, profilePhotoUrl = ?, locationLat = ?, locationLng = ?, voipToken = ?, platform = ?, firebaseToken = ?, lastUpdated = ?',
+      positionalParams: <Object?>[
+        entity.uid,
+        entity.displayName,
+        entity.profilePhotoUrl,
+        entity.locationLat,
+        entity.locationLng,
+        entity.voipToken,
+        entity.platform,
+        entity.firebaseToken,
+        entity.lastUpdated,
+        entity.displayName,
+        entity.profilePhotoUrl,
+        entity.locationLat,
+        entity.locationLng,
+        entity.voipToken,
+        entity.platform,
+        entity.firebaseToken,
+        entity.lastUpdated,
+      ],
+    );
+  }
+
+  // SELECT ------------------------------------------------------------------
+  Future<List<NewUser>> findAllNewUsers() async => runSql<List<NewUser>>(
+    'SELECT * FROM Users',
+    mapper: (rows) => rows.map(NewUserMapper.fromRow).toList(),
+  );
+
+  Future<List<NewUser>> findNewUsersWhere(
+    String condition,
+    List<Object?> positionalParams,
+  ) async {
+    return runSql<List<NewUser>>(
+      'SELECT * FROM Users WHERE $condition',
+      positionalParams: positionalParams,
+      mapper: (rows) => rows.map(NewUserMapper.fromRow).toList(),
+    );
+  }
+}
+
+class NewUserCrudHelpers {
+  static Future<void> insert(
+    SqlEngineDatabase db, {
+    required String uid,
+    required String displayName,
+    String? profilePhotoUrl,
+    double? locationLat,
+    double? locationLng,
+    String? voipToken,
+    String? platform,
+    String? firebaseToken,
+    int? lastUpdated,
+  }) async {
+    await db.insertNewUser(
+      NewUser(
+        uid: uid,
+        displayName: displayName,
+        profilePhotoUrl: profilePhotoUrl,
+        locationLat: locationLat,
+        locationLng: locationLng,
+        voipToken: voipToken,
+        platform: platform,
+        firebaseToken: firebaseToken,
+        lastUpdated: lastUpdated,
+      ),
+    );
+  }
+
+  static Future<void> update(
+    SqlEngineDatabase db, {
+    required String uid,
+    required String displayName,
+    String? profilePhotoUrl,
+    double? locationLat,
+    double? locationLng,
+    String? voipToken,
+    String? platform,
+    String? firebaseToken,
+    int? lastUpdated,
+  }) async {
+    await db.updateNewUser(
+      NewUser(
+        uid: uid,
+        displayName: displayName,
+        profilePhotoUrl: profilePhotoUrl,
+        locationLat: locationLat,
+        locationLng: locationLng,
+        voipToken: voipToken,
+        platform: platform,
+        firebaseToken: firebaseToken,
+        lastUpdated: lastUpdated,
+      ),
+    );
+  }
+
+  static Future<void> upsert(
+    SqlEngineDatabase db, {
+    required String uid,
+    required String displayName,
+    String? profilePhotoUrl,
+    double? locationLat,
+    double? locationLng,
+    String? voipToken,
+    String? platform,
+    String? firebaseToken,
+    int? lastUpdated,
+  }) async {
+    await db.upsertNewUser(
+      NewUser(
+        uid: uid,
+        displayName: displayName,
+        profilePhotoUrl: profilePhotoUrl,
+        locationLat: locationLat,
+        locationLng: locationLng,
+        voipToken: voipToken,
+        platform: platform,
+        firebaseToken: firebaseToken,
+        lastUpdated: lastUpdated,
+      ),
+    );
+  }
+
+  static Future<void> deleteById(SqlEngineDatabase db, Object? id) async {
+    await db.deleteNewUserById(id);
+  }
+
+  static Future<void> deleteIdWhere(SqlEngineDatabase db, Object? id) async {
+    await db.deleteNewUserById(id);
+  }
+
+  static Future<void> deleteWhere(
+    SqlEngineDatabase db,
+    String field,
+    Object? value,
+  ) async {
+    await db.deleteNewUserWhere(field, value);
+  }
+
+  static Future<List<NewUser>> findAll(SqlEngineDatabase db) async {
+    return await db.findAllNewUsers();
+  }
+
+  static Future<List<NewUser>> findWhere(
+    SqlEngineDatabase db,
+    String condition,
+    List<Object?> positionalParams,
+  ) async {
+    return await db.findNewUsersWhere(condition, positionalParams);
+  }
+
+  static Future<void> flush(SqlEngineDatabase db) async {
+    await db.flushNewUsers();
+  }
+}

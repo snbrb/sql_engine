@@ -1,9 +1,10 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:source_gen/source_gen.dart';
 
 import '../../sql_engine.dart';
-import '../enums/sql_type.dart';
 
 /// Extract all `SqlSchema` annotations from the given [element].
 /// Returns a sorted list of schemas by ascending version.
@@ -12,7 +13,9 @@ List<SqlSchema> extractSqlSchemas(ClassElement element) {
 
   for (final ElementAnnotation metadata in element.metadata) {
     final DartObject? constantValue = metadata.computeConstantValue();
-    if (constantValue == null) continue;
+    if (constantValue == null) {
+      continue;
+    }
 
     final ConstantReader reader = ConstantReader(constantValue);
     if (reader.instanceOf(TypeChecker.fromRuntime(SqlSchema))) {

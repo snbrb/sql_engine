@@ -22,14 +22,14 @@ class _SqlEngineHomePageState extends State<SqlEngineHomePage> {
 
   Future<void> _createDatabase() async {
     await db.open();
-    _log('✅ Database created');
+    _log('Database created');
   }
 
   Future<void> _createModels() async {
     await db.flush('users');
     await db.flush('orders');
     await db.flush('order_items');
-    _log('✅ Tables cleared');
+    _log('Tables cleared');
   }
 
   Future<void> _insertData() async {
@@ -41,7 +41,7 @@ class _SqlEngineHomePageState extends State<SqlEngineHomePage> {
         DateTime.now().millisecondsSinceEpoch,
       ],
     );
-    _log('✅ Inserted user');
+    _log('Inserted user');
   }
 
   Future<void> _viewData() async {
@@ -49,7 +49,7 @@ class _SqlEngineHomePageState extends State<SqlEngineHomePage> {
       'SELECT * FROM users',
       mapper: (rows) => rows.map(UserMapper.fromRow).toList(),
     );
-    _log('👤 Users: ${users.map((u) => u.name).join(', ')}');
+    _log(' Users: ${users.map((u) => u.name).join(', ')}');
   }
 
   Future<void> _viewJoinData() async {
@@ -59,7 +59,7 @@ class _SqlEngineHomePageState extends State<SqlEngineHomePage> {
       JOIN orders o ON u.id = o.customer_id
       JOIN order_items i ON o.id = i.order_id
       ''');
-    _log('🔗 Join result: $rows');
+    _log(' Join result: $rows');
   }
 
   Future<void> _upsertData() async {
@@ -76,7 +76,7 @@ class _SqlEngineHomePageState extends State<SqlEngineHomePage> {
         DateTime.now().millisecondsSinceEpoch,
       ],
     );
-    _log('🔁 Upserted user with id=1');
+    _log(' Upserted user with id=1');
   }
 
   Future<void> _insertRelatedData() async {
@@ -88,7 +88,7 @@ class _SqlEngineHomePageState extends State<SqlEngineHomePage> {
       'INSERT INTO order_items (order_id, product_name, quantity, price) VALUES (?, ?, ?, ?)',
       positionalParams: [1, 'Mechanical Keyboard', 1, 150.0],
     );
-    _log('📦 Inserted related order + item');
+    _log(' Inserted related order + item');
   }
 
   Future<void> _selectRelatedData() async {
@@ -98,7 +98,7 @@ class _SqlEngineHomePageState extends State<SqlEngineHomePage> {
       JOIN orders o ON u.id = o.customer_id
       JOIN order_items i ON o.id = i.order_id
       ''');
-    _log('📥 Related rows: $rows');
+    _log(' Related rows: $rows');
   }
 
   void _log(String msg) {

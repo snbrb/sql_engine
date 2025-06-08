@@ -1,7 +1,9 @@
 import '../../sql_engine.dart';
 import 'extract_sql_create_table_query.dart';
+import 'generate_crud_methods.dart';
 import 'generate_mapper_extension.dart';
 import 'generate_migration_code.dart';
+import 'generate_model_crud_helpers.dart';
 
 String generateSqlEngineTableClass({
   required String originalClassName,
@@ -18,6 +20,17 @@ String generateSqlEngineTableClass({
   final String mapperExtension = generateMapperExtension(
     originalClassName,
     columns,
+  );
+  final String crudHelpers = generateModelCrudHelpers(
+    className: originalClassName,
+    tableName: tableName,
+    columns: columns,
+  );
+
+  final String crudMethods = generateCrudMethods(
+    originalClassName: originalClassName,
+    tableName: tableName,
+    columns: columns,
   );
 
   //create indexSql for indexes
@@ -57,5 +70,7 @@ class ${originalClassName}Table extends SqlEngineTable {
   ];
 }
 $mapperExtension
+$crudMethods
+$crudHelpers
 ''';
 }
