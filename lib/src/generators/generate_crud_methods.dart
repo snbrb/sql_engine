@@ -12,32 +12,51 @@ String generateCrudMethods({
   required List<SqlColumn> columns,
 }) {
   final String pkName =
-      columns.firstWhere((c) => c.primaryKey, orElse: () => columns.first).name;
+      columns
+          .firstWhere(
+            (SqlColumn c) => c.primaryKey,
+            orElse: () => columns.first,
+          )
+          .name;
 
   // SQL insert clause
-  final String csvColumnNames = columns.map((c) => c.name).join(', ');
-  final String csvPlaceholders = List.filled(columns.length, '?').join(', ');
+  final String csvColumnNames = columns.map((SqlColumn c) => c.name).join(', ');
+  final String csvPlaceholders = List<dynamic>.filled(
+    columns.length,
+    '?',
+  ).join(', ');
 
   // INSERT positional values
   final String positionalFromEntity = columns
       .map((SqlColumn c) {
         final String dartField = 'entity.${StringUtils.snakeToCamel(c.name)}';
-        return c.type == SqlType.date
-            ? '$dartField?.millisecondsSinceEpoch'
-            : dartField;
+        if (c.type == SqlType.date) {
+          final String accessor =
+              c.nullable
+                  ? '$dartField?.millisecondsSinceEpoch'
+                  : '$dartField.millisecondsSinceEpoch';
+          return accessor;
+        }
+        return dartField;
       })
       .join(',\n        ');
 
   // UPDATE clause
-  final List<SqlColumn> nonPk = columns.where((c) => !c.primaryKey).toList();
-  final String setClause = nonPk.map((c) => '${c.name} = ?').join(', ');
+  final List<SqlColumn> nonPk =
+      columns.where((SqlColumn c) => !c.primaryKey).toList();
+  final String setClause = nonPk
+      .map((SqlColumn c) => '${c.name} = ?')
+      .join(', ');
   final String positionalUpdate = <String>[
     for (final SqlColumn c in nonPk)
       () {
         final String dartField = 'entity.${StringUtils.snakeToCamel(c.name)}';
-        return c.type == SqlType.date
-            ? '$dartField?.millisecondsSinceEpoch'
-            : dartField;
+        if (c.type == SqlType.date) {
+          return c.nullable
+              ? '$dartField?.millisecondsSinceEpoch'
+              : '$dartField.millisecondsSinceEpoch';
+        }
+        return dartField;
       }(),
     'entity.${StringUtils.snakeToCamel(pkName)}',
   ].join(',\n        ');

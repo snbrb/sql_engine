@@ -67,7 +67,7 @@ extension OrderCrud on SqlEngineDatabase {
       positionalParams: <Object?>[
         entity.id,
         entity.customerId,
-        entity.orderDate?.millisecondsSinceEpoch,
+        entity.orderDate.millisecondsSinceEpoch,
         entity.total,
       ],
     );
@@ -93,7 +93,7 @@ extension OrderCrud on SqlEngineDatabase {
       'UPDATE orders SET customer_id = ?, order_date = ?, total = ? WHERE id = ?',
       positionalParams: <Object?>[
         entity.customerId,
-        entity.orderDate?.millisecondsSinceEpoch,
+        entity.orderDate.millisecondsSinceEpoch,
         entity.total,
         entity.id,
       ],
@@ -108,10 +108,10 @@ extension OrderCrud on SqlEngineDatabase {
       positionalParams: <Object?>[
         entity.id,
         entity.customerId,
-        entity.orderDate?.millisecondsSinceEpoch,
+        entity.orderDate.millisecondsSinceEpoch,
         entity.total,
         entity.customerId,
-        entity.orderDate?.millisecondsSinceEpoch,
+        entity.orderDate.millisecondsSinceEpoch,
         entity.total,
       ],
     );
