@@ -1,3 +1,7 @@
+## [2.0.2] - 2025-06-10
+- updated documentation for models
+
+
 ## [2.0.1] - 2025-06-08
 
 ### ✨ Added

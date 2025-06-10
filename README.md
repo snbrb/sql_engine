@@ -1,4 +1,4 @@
-#  sql_engine
+# sql_engine
 
 *A thin yet powerful SQLite layer for Dart & Flutter.*
 
@@ -6,7 +6,7 @@
 
 ---
 
-##  Key features
+## Key features
 
 - **Raw SQL freedom** – run any statement you like (`JOIN`, `UPSERT`, FTS5…).
 - **Schema annotations** – use `@SqlTable` + `@SqlSchema` to generate  
@@ -15,15 +15,16 @@
     1. *Low‑level* `SqlEngineDatabase` – explicit registration.
     2. *Drift‑style* `@SqlDatabase` – one annotation, everything wired for you.
 - **Model mapping** – `fromRow` / `toRow` helpers are generated for each table.
+- **🔁 Generated CRUD helpers** – just call `UserCrudHelpers.insert(...)` with named args.
 - **No mirrors, no hidden allocations** – works on Flutter, server, CLI, Wasm.
 
 ---
 
-##  Install
+## Install
 
 ```yaml
 dependencies:
-  sql_engine: ^2.0.0
+  sql_engine: ^2.0.1
   sqlite3: ^2.3.0    # native engine
   build_runner: ^2.4.6
   source_gen: ^1.5.0
@@ -45,40 +46,6 @@ import 'package:sql_engine/sql_engine.dart';
 
 part 'user.g.dart';
 
-@SqlTable(tableName: 'users', version: 2)
-
-@SqlSchema(
-  version: 1,
-  columns: [
-    SqlColumn(name: 'id',  type: SqlType.integer, primaryKey: true, autoincrement: true, nullable: false),
-    SqlColumn(name: 'name', type: SqlType.text,    nullable: false),
-  ],
-)
-
-@SqlSchema(
-  version: 2,
-  columns: [
-    SqlColumn(name: 'id',  type: SqlType.integer, primaryKey: true, autoincrement: true, nullable: false),
-    SqlColumn(name: 'full_name', type: SqlType.text, nullable: false, renamedFrom: 'name'),
-    SqlColumn(name: 'email', type: SqlType.text, nullable: true),
-  ],
-)
-class User {
-  final int? id;
-  final String fullName;
-  final String? email;
-
-  User({this.id, required this.fullName, this.email});
-}
-```
-
-### 1.2 Define a model with index
-
-```dart
-import 'package:sql_engine/sql_engine.dart';
-
-part 'user.g.dart';
-
 @SqlTable(tableName: 'users', version: 1)
 @SqlIndex(name: 'idx_user_email', columns: ['email'])
 
@@ -86,57 +53,80 @@ part 'user.g.dart';
   version: 1,
   columns: [
     SqlColumn(name: 'id', type: SqlType.integer, primaryKey: true, autoincrement: true, nullable: false),
-    SqlColumn(name: 'email', type: SqlType.text, nullable: false),
+    SqlColumn(name: 'name', type: SqlType.text, nullable: false),
+    SqlColumn(name: 'male', type: SqlType.boolean),
     SqlColumn(name: 'created_at', type: SqlType.date),
+    SqlColumn(name: 'data', type: SqlType.json),
   ],
 )
 class User {
   final int? id;
-  final String email;
+  final String name;
+  final bool? male;
   final DateTime? createdAt;
+  final Map<String, dynamic>? data;
 
-  User({this.id, required this.email, this.createdAt});
+  User({this.id, required this.name, this.male, this.createdAt, this.data});
 }
 ```
-
-Run the generator. You'll get user.g.dart with:
-- `UserTable` (DDL + migrations)
-- `UserMapper.fromRow` / `toRow`
-- `createIndexes` override to register all `@SqlIndex` definitions
 
 ---
 
 ### 2A. Manual database (explicit)
 
 ```dart
-final db = SqlEngineDatabase(); // enableLog
+final db = SqlEngineDatabase();
 
 db.registerTable([
-  const UserTable(),       // generated class
+  const UserTable(), // generated class
 ]);
 
-await db.open();           // uses :memory: by default
+await db.open(); // uses in-memory by default
 ```
 
-### 2B. Annotated app database (automatic)
+---
+
+##  NEW: CRUD Helper Methods (2.0.1)
+
+Once your model is annotated, the generator will also emit strongly‑typed helpers like:
 
 ```dart
-import 'package:sql_engine/sql_engine.dart';
-import 'user.dart';
-
-part 'app_database.g.dart';
-
-@SqlDatabase(
-  version: 2,
-  models: [User],
-)
-class AppDatabase {}
+UserCrudHelpers.insert(db, id: 1, name: 'Alice', createdAt: DateTime.now());
+UserCrudHelpers.deleteById(db, 1);
+UserCrudHelpers.update(db, id: 1, name: 'New Name');
+UserCrudHelpers.upsert(db, id: 1, name: 'Final Name');
+UserCrudHelpers.findAll(db);
+UserCrudHelpers.findWhere(db, 'name = ?', ['Alice']);
 ```
+
+### Full example:
 
 ```dart
-final db = $AppDatabase(); // generated subclass
-await db.open();
+await UserCrudHelpers.insert(
+  db,
+  id: 1,
+  name: 'Alice',
+  male: false,
+  createdAt: DateTime.now(),
+  data: {'role': 'admin'},
+);
+
+await UserCrudHelpers.update(
+  db,
+  id: 1,
+  name: 'Alice Updated',
+);
+
+final users = await UserCrudHelpers.findWhere(
+  db,
+  'name = ?',
+  ['Alice Updated'],
+);
+
+await UserCrudHelpers.deleteById(db, 1);
 ```
+
+These are generated per model and are available under `<ModelName>CrudHelpers`.
 
 ---
 
@@ -227,7 +217,7 @@ await db.transaction(() async {
 
 ---
 
-##  Related terms
+## Related terms
 
 SQL, SQLite, FTS5, UPSERT, JOIN, WAL, migration, schema, Dart ORM.
 
@@ -246,13 +236,13 @@ See `CONTRIBUTING.md` for details.
 
 ---
 
-##  Support
+## Support
 
 - File an issue on the [GitHub tracker](https://github.com/snbrb/sql_engine/issues)
 - Or email: bilalrabbi@gmail.com
 
 ---
 
-##  Acknowledgments
+## Acknowledgments
 
 Thanks to my mentor [skn3](https://github.com/skn3) for their support and guidance on this project and beyond!
