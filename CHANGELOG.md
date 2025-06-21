@@ -1,6 +1,6 @@
 ## [2.0.3] - 2025-06-12
 
-### ✨ Added
+###  Added
 
 - **Initial Seed Data Support**
   - `@SqlSchema` now accepts a `seedData` field:
