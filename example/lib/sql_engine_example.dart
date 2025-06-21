@@ -23,6 +23,14 @@ class _SqlEngineHomePageState extends State<SqlEngineHomePage> {
   Future<void> _createDatabase() async {
     await db.open();
     _log('Database created');
+
+    // Immediately view and log seeded data
+    final users = await db.runSql<List<User>>(
+      'SELECT * FROM users',
+      mapper: (rows) => rows.map(UserMapper.fromRow).toList(),
+    );
+
+    _log('Seeded Users: ${users.map((u) => u.name).join(', ')}');
   }
 
   Future<void> _createModels() async {

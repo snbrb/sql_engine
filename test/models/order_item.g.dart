@@ -26,6 +26,9 @@ class OrderItemTable extends SqlEngineTable {
   };
 
   @override
+  List<Map<String, dynamic>> get initialSeedData => <Map<String, dynamic>>[];
+
+  @override
   List<String> get createIndexes => [];
 
   @override

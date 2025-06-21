@@ -61,5 +61,28 @@ SqlSchema parseSqlSchema(ConstantReader schemaReader) {
     );
   }
 
-  return SqlSchema(version: version, columns: columns);
+  // Parse seedData if provided
+  final List<Map<String, Object?>> seedData = <Map<String, Object?>>[];
+
+  for (final DartObject mapObj in schemaReader.read('seedData').listValue) {
+    final Map<String, Object?> row = <String, Object?>{};
+    final Map<DartObject?, DartObject?>? mapValues = mapObj.toMapValue();
+    if (mapValues != null) {
+      for (final MapEntry<DartObject?, DartObject?> entry
+          in mapValues.entries) {
+        final String? key = entry.key?.toStringValue();
+        final Object? value =
+            entry.value?.toStringValue() ??
+            entry.value?.toIntValue() ??
+            entry.value?.toBoolValue() ??
+            entry.value?.toDoubleValue();
+        if (key != null) {
+          row[key] = value;
+        }
+      }
+    }
+    seedData.add(row);
+  }
+
+  return SqlSchema(version: version, columns: columns, seedData: seedData);
 }

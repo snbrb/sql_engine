@@ -1,5 +1,4 @@
 import 'package:sql_engine/sql_engine.dart';
-import 'package:sql_engine/src/enums/sql_type.dart';
 
 part 'new_user.g.dart';
 

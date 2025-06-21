@@ -107,6 +107,16 @@ class SqlEngineDatabase {
     for (final SqlEngineTable tbl in _tableObjects) {
       final String ddl = tbl.createSqlFor(version); // ← use target version
       database.execute(ddl);
+      for (final Map<String, Object?> row in tbl.initialSeedData) {
+        final String keys = row.keys.join(', ');
+        final String placeholders = row.keys.map((_) => '?').join(', ');
+        final List<Object?> values = row.values.toList();
+
+        database.execute(
+          'INSERT INTO ${tbl.tableName} ($keys) VALUES ($placeholders)',
+          values,
+        );
+      }
     }
 
     // 3. Run CREATE INDEX statements

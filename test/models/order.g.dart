@@ -25,6 +25,9 @@ class OrderTable extends SqlEngineTable {
   };
 
   @override
+  List<Map<String, dynamic>> get initialSeedData => <Map<String, dynamic>>[];
+
+  @override
   List<String> get createIndexes => [];
 
   @override
@@ -111,7 +114,7 @@ extension OrderCrud on SqlEngineDatabase {
         entity.orderDate.millisecondsSinceEpoch,
         entity.total,
         entity.customerId,
-        entity.orderDate.millisecondsSinceEpoch,
+        entity.orderDate?.millisecondsSinceEpoch,
         entity.total,
       ],
     );

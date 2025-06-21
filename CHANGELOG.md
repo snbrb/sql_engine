@@ -1,3 +1,43 @@
+## [2.0.3] - 2025-06-12
+
+### ✨ Added
+
+- **Initial Seed Data Support**
+  - `@SqlSchema` now accepts a `seedData` field:
+    ```dart
+    @SqlSchema(
+      version: 1,
+      columns: [...],
+      seedData: [
+        {'name': 'Alice', 'male': false},
+        {'name': 'Bob', 'male': true},
+      ],
+    )
+    ```
+  - Seed rows are **automatically inserted** into the table **on first creation only**.
+  - Supports:
+    - `DateTime` (use `millisecondsSinceEpoch`)
+    - `bool` (stored as `0/1`)
+    - `null` values
+  - Automatically skipped if the table already exists.
+  - Available during `db.open()` lifecycle — no extra config required.
+
+### Example
+
+```dart
+@SqlSchema(
+  version: 1,
+  columns: [...],
+  seedData: [
+    {
+      'name': 'Ada',
+      'male': true,
+      'created_at': DateTime(2024, 1, 1).millisecondsSinceEpoch,
+    }
+  ],
+)
+```
+
 ## [2.0.2] - 2025-06-10
 - updated documentation for models
 

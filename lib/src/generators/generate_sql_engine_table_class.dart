@@ -4,6 +4,7 @@ import 'generate_crud_methods.dart';
 import 'generate_mapper_extension.dart';
 import 'generate_migration_code.dart';
 import 'generate_model_crud_helpers.dart';
+import 'generate_seed_data.dart';
 
 String generateSqlEngineTableClass({
   required String originalClassName,
@@ -44,6 +45,9 @@ String generateSqlEngineTableClass({
         return '${s.version}: r"""$sql""",';
       }).join();
 
+  final SqlSchema latestSchema = schemas.last;
+  final String initialSeedData = generateSeedData(latestSchema.seedData);
+
   return '''
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
@@ -55,6 +59,8 @@ class ${originalClassName}Table extends SqlEngineTable {
     $historyEntries
   };
 
+  @override
+  List<Map<String, dynamic>> get initialSeedData => $initialSeedData;
 
   @override
   List<String> get createIndexes => [

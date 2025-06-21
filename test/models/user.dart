@@ -26,6 +26,21 @@ part 'user.g.dart';
       nullable: true,
     ), // optional blob
   ],
+
+  seedData: <Map<String, dynamic>>[
+    <String, dynamic>{
+      'name': 'Alice',
+      'male': false,
+      'created_at': 1717800000000, // millisecondsSinceEpoch
+      'data': null,
+    },
+    <String, dynamic>{
+      'name': 'Bob',
+      'male': true,
+      'created_at': 1717900000000,
+      'data': null,
+    },
+  ],
 )
 @SqlIndex(name: 'idx_user_name', columns: <String>['name'])
 class User {

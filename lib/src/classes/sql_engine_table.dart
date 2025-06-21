@@ -15,6 +15,9 @@ abstract class SqlEngineTable {
       createTableHistory[version] ??
       (throw ArgumentError('No CREATE TABLE for $tableName version $version'));
 
+  /// optional seed data
+  List<Map<String, dynamic>> get initialSeedData => <Map<String, dynamic>>[];
+
   //String get createTable => '';
 
   //constructor

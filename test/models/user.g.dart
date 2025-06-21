@@ -26,6 +26,12 @@ class UserTable extends SqlEngineTable {
   };
 
   @override
+  List<Map<String, dynamic>> get initialSeedData => <Map<String, dynamic>>[
+    {'name': 'Alice', 'male': false, 'created_at': 1717800000000, 'data': null},
+    {'name': 'Bob', 'male': true, 'created_at': 1717900000000, 'data': null},
+  ];
+
+  @override
   List<String> get createIndexes => [
     r"""CREATE INDEX idx_user_name ON users (name);""",
   ];

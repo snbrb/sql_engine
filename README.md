@@ -20,6 +20,40 @@
 
 ---
 
+
+##  NEW in 2.0.3: Initial Seed Data
+
+You can now define **seed data** inside your `@SqlSchema` annotation.  
+This allows you to auto-populate a table **on first creation only** — great for test users or static defaults.
+
+### Example
+
+```dart
+@SqlSchema(
+  version: 1,
+  columns: [...],
+  seedData: [
+    {
+      'name': 'Alice',
+      'male': false,
+      'created_at': DateTime(2025, 6, 1).millisecondsSinceEpoch,
+    },
+    {
+      'name': 'Bob',
+      'male': true,
+      'created_at': DateTime(2025, 6, 2).millisecondsSinceEpoch,
+    }
+  ],
+)
+```
+
+Seed data is inserted only if the table is being created for the first time.
+
+Supported value types:
+- `int`, `double`, `bool`, `String`, `DateTime` (as `millisecondsSinceEpoch`), `null`
+
+---
+
 ## Install
 
 ```yaml
@@ -37,7 +71,7 @@ dart run build_runner build --delete-conflicting-outputs
 
 ---
 
-## 🛠 Quick start
+##  Quick start
 
 ### 1. Define a model
 
