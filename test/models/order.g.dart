@@ -120,7 +120,7 @@ extension OrderCrud on SqlEngineDatabase {
         entity.orderDate.millisecondsSinceEpoch,
         entity.total,
         entity.customerId,
-        entity.orderDate?.millisecondsSinceEpoch,
+        entity.orderDate.millisecondsSinceEpoch,
         entity.total,
       ],
     );
