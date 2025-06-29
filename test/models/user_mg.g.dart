@@ -121,10 +121,7 @@ extension UserMgCrud on SqlEngineDatabase {
 
   // SELECT ------------------------------------------------------------------
   Future<List<UserMg>> findAllUserMgs({bool includeDeleted = false}) async {
-    final String query =
-        includeDeleted
-            ? 'SELECT * FROM user_mg'
-            : 'SELECT * FROM user_mg WHERE deleted_at IS NULL';
+    final String query = 'SELECT * FROM user_mg';
 
     return runSql<List<UserMg>>(
       query,
@@ -137,10 +134,7 @@ extension UserMgCrud on SqlEngineDatabase {
     List<dynamic> positionalParams, {
     bool includeDeleted = false,
   }) async {
-    final String query =
-        includeDeleted
-            ? 'SELECT * FROM user_mg WHERE $condition'
-            : 'SELECT * FROM user_mg WHERE ($condition) AND deleted_at IS NULL';
+    final String query = 'SELECT * FROM user_mg WHERE $condition';
 
     return runSql<List<UserMg>>(
       query,

@@ -59,11 +59,19 @@ extension UserMapper on User {
       male: row.containsKey('male') ? row['male'] == 1 : null,
       createdAt:
           row.containsKey('created_at') && row['created_at'] != null
-              ? DateTime.fromMillisecondsSinceEpoch(row['created_at'] as int)
+              ? DateTime.fromMillisecondsSinceEpoch(
+                row['created_at'] is int
+                    ? row['created_at'] as int
+                    : int.tryParse('${row['created_at']}') ?? 0,
+              )
               : null,
       deletedAt:
           row.containsKey('deleted_at') && row['deleted_at'] != null
-              ? DateTime.fromMillisecondsSinceEpoch(row['deleted_at'] as int)
+              ? DateTime.fromMillisecondsSinceEpoch(
+                row['deleted_at'] is int
+                    ? row['deleted_at'] as int
+                    : int.tryParse('${row['deleted_at']}') ?? 0,
+              )
               : null,
       data: row['data'] as List<int>?,
     );

@@ -55,6 +55,16 @@ String generateCrudMethods({
     'entity.${StringUtils.snakeToCamel(pkName)}',
   ].join(',\n        ');
 
+  final String selectAllQuery =
+      softDelete
+          ? "includeDeleted ? 'SELECT * FROM $tableName' : 'SELECT * FROM $tableName WHERE deleted_at IS NULL'"
+          : "'SELECT * FROM $tableName'";
+
+  final String selectWhereQuery =
+      softDelete
+          ? "includeDeleted ? 'SELECT * FROM $tableName WHERE \$condition' : 'SELECT * FROM $tableName WHERE (\$condition) AND deleted_at IS NULL'"
+          : "'SELECT * FROM $tableName WHERE \$condition'";
+
   return '''
 extension ${originalClassName}Crud on SqlEngineDatabase {
 
@@ -118,9 +128,7 @@ extension ${originalClassName}Crud on SqlEngineDatabase {
 
   // SELECT ------------------------------------------------------------------
   Future<List<$originalClassName>> findAll${originalClassName}s({bool includeDeleted = false}) async {
-    final String query = includeDeleted
-      ? 'SELECT * FROM $tableName'
-      : 'SELECT * FROM $tableName WHERE deleted_at IS NULL';
+    final String query = $selectAllQuery;
 
     return runSql<List<$originalClassName>>(
       query,
@@ -133,9 +141,7 @@ extension ${originalClassName}Crud on SqlEngineDatabase {
     List<dynamic> positionalParams, {
     bool includeDeleted = false,
   }) async {
-    final String query = includeDeleted
-      ? 'SELECT * FROM $tableName WHERE \$condition'
-      : 'SELECT * FROM $tableName WHERE (\$condition) AND deleted_at IS NULL';
+    final String query = $selectWhereQuery;
 
     return runSql<List<$originalClassName>>(
       query,

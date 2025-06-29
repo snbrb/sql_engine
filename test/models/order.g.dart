@@ -47,7 +47,11 @@ extension OrderMapper on Order {
     return Order(
       id: row['id'] as int,
       customerId: row['customer_id'] as int,
-      orderDate: DateTime.fromMillisecondsSinceEpoch(row['order_date'] as int),
+      orderDate: DateTime.fromMillisecondsSinceEpoch(
+        row['order_date'] is int
+            ? row['order_date'] as int
+            : int.tryParse('${row['order_date']}') ?? 0,
+      ),
       total: (row['total'] as num).toDouble(),
     );
   }
@@ -120,7 +124,7 @@ extension OrderCrud on SqlEngineDatabase {
         entity.orderDate.millisecondsSinceEpoch,
         entity.total,
         entity.customerId,
-        entity.orderDate.millisecondsSinceEpoch,
+        entity.orderDate?.millisecondsSinceEpoch,
         entity.total,
       ],
     );
@@ -128,10 +132,7 @@ extension OrderCrud on SqlEngineDatabase {
 
   // SELECT ------------------------------------------------------------------
   Future<List<Order>> findAllOrders({bool includeDeleted = false}) async {
-    final String query =
-        includeDeleted
-            ? 'SELECT * FROM orders'
-            : 'SELECT * FROM orders WHERE deleted_at IS NULL';
+    final String query = 'SELECT * FROM orders';
 
     return runSql<List<Order>>(
       query,
@@ -144,10 +145,7 @@ extension OrderCrud on SqlEngineDatabase {
     List<dynamic> positionalParams, {
     bool includeDeleted = false,
   }) async {
-    final String query =
-        includeDeleted
-            ? 'SELECT * FROM orders WHERE $condition'
-            : 'SELECT * FROM orders WHERE ($condition) AND deleted_at IS NULL';
+    final String query = 'SELECT * FROM orders WHERE $condition';
 
     return runSql<List<Order>>(
       query,

@@ -138,10 +138,7 @@ extension OrderItemCrud on SqlEngineDatabase {
   Future<List<OrderItem>> findAllOrderItems({
     bool includeDeleted = false,
   }) async {
-    final String query =
-        includeDeleted
-            ? 'SELECT * FROM order_items'
-            : 'SELECT * FROM order_items WHERE deleted_at IS NULL';
+    final String query = 'SELECT * FROM order_items';
 
     return runSql<List<OrderItem>>(
       query,
@@ -154,10 +151,7 @@ extension OrderItemCrud on SqlEngineDatabase {
     List<dynamic> positionalParams, {
     bool includeDeleted = false,
   }) async {
-    final String query =
-        includeDeleted
-            ? 'SELECT * FROM order_items WHERE $condition'
-            : 'SELECT * FROM order_items WHERE ($condition) AND deleted_at IS NULL';
+    final String query = 'SELECT * FROM order_items WHERE $condition';
 
     return runSql<List<OrderItem>>(
       query,

@@ -25,12 +25,14 @@ String generateMapperExtension(String className, List<SqlColumn> columns) {
     }
 
     if (col.type == SqlType.date) {
+      final String parseExpr =
+          "row['$name'] is int ? row['$name'] as int : int.tryParse('\${row['$name']}') ?? 0";
       final String read =
           nullable
               ? "row.containsKey('$name') && row['$name'] != null "
-                  "? DateTime.fromMillisecondsSinceEpoch(row['$name'] as int) "
-                  ": null"
-              : "DateTime.fromMillisecondsSinceEpoch(row['$name'] as int)";
+                  '? DateTime.fromMillisecondsSinceEpoch($parseExpr) '
+                  ': null'
+              : 'DateTime.fromMillisecondsSinceEpoch($parseExpr)';
       final String write =
           nullable
               ? '$dartKey?.millisecondsSinceEpoch'
@@ -45,7 +47,7 @@ String generateMapperExtension(String className, List<SqlColumn> columns) {
           nullable
               ? "row.containsKey('$name') && row['$name'] != null "
                   "? (row['$name'] as num).toDouble() "
-                  ": null"
+                  ': null'
               : "(row['$name'] as num).toDouble()";
       fromBuffer.writeln('      $dartKey: $read,');
       toBuffer.writeln("      '$name': $dartKey,"); // <- no trailing ?

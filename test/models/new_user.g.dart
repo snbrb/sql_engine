@@ -182,10 +182,7 @@ extension NewUserCrud on SqlEngineDatabase {
 
   // SELECT ------------------------------------------------------------------
   Future<List<NewUser>> findAllNewUsers({bool includeDeleted = false}) async {
-    final String query =
-        includeDeleted
-            ? 'SELECT * FROM Users'
-            : 'SELECT * FROM Users WHERE deleted_at IS NULL';
+    final String query = 'SELECT * FROM Users';
 
     return runSql<List<NewUser>>(
       query,
@@ -198,10 +195,7 @@ extension NewUserCrud on SqlEngineDatabase {
     List<dynamic> positionalParams, {
     bool includeDeleted = false,
   }) async {
-    final String query =
-        includeDeleted
-            ? 'SELECT * FROM Users WHERE $condition'
-            : 'SELECT * FROM Users WHERE ($condition) AND deleted_at IS NULL';
+    final String query = 'SELECT * FROM Users WHERE $condition';
 
     return runSql<List<NewUser>>(
       query,
