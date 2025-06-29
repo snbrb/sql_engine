@@ -101,7 +101,7 @@ extension NewUserCrud on SqlEngineDatabase {
   Future<void> insertNewUser(NewUser entity) async {
     await runSql(
       'INSERT INTO Users (uid, displayName, profilePhotoUrl, locationLat, locationLng, voipToken, platform, firebaseToken, lastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      positionalParams: <Object?>[
+      positionalParams: <dynamic>[
         entity.uid,
         entity.displayName,
         entity.profilePhotoUrl,
@@ -116,24 +116,30 @@ extension NewUserCrud on SqlEngineDatabase {
   }
 
   // DELETE ------------------------------------------------------------------
-  Future<int> deleteNewUserById(Object? id) async => runSql<int>(
+  Future<int> deleteNewUserById(dynamic id) async => runSql<int>(
     'DELETE FROM Users WHERE uid = ?',
-    positionalParams: <Object?>[id],
+    positionalParams: <dynamic>[id],
   );
 
-  Future<int> deleteNewUserWhere(String field, Object? value) async =>
+  Future<int> deleteNewUserWhere(String field, dynamic value) async =>
       runSql<int>(
         'DELETE FROM Users WHERE $field = ?',
-        positionalParams: <Object?>[value],
+        positionalParams: <dynamic>[value],
       );
 
   Future<int> flushNewUsers() async => runSql<int>('DELETE FROM Users');
+
+  // RESTORE ------------------------------------------------------------------
+  Future<int> restoreNewUserById(dynamic id) async => runSql<int>(
+    'UPDATE Users SET deleted_at = NULL WHERE uid = ?',
+    positionalParams: <dynamic>[id],
+  );
 
   // UPDATE ------------------------------------------------------------------
   Future<void> updateNewUser(NewUser entity) async {
     await runSql(
       'UPDATE Users SET displayName = ?, profilePhotoUrl = ?, locationLat = ?, locationLng = ?, voipToken = ?, platform = ?, firebaseToken = ?, lastUpdated = ? WHERE uid = ?',
-      positionalParams: <Object?>[
+      positionalParams: <dynamic>[
         entity.displayName,
         entity.profilePhotoUrl,
         entity.locationLat,
@@ -152,7 +158,7 @@ extension NewUserCrud on SqlEngineDatabase {
     await runSql(
       'INSERT INTO Users (uid, displayName, profilePhotoUrl, locationLat, locationLng, voipToken, platform, firebaseToken, lastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) '
       'ON CONFLICT(uid) DO UPDATE SET displayName = ?, profilePhotoUrl = ?, locationLat = ?, locationLng = ?, voipToken = ?, platform = ?, firebaseToken = ?, lastUpdated = ?',
-      positionalParams: <Object?>[
+      positionalParams: <dynamic>[
         entity.uid,
         entity.displayName,
         entity.profilePhotoUrl,
@@ -175,17 +181,30 @@ extension NewUserCrud on SqlEngineDatabase {
   }
 
   // SELECT ------------------------------------------------------------------
-  Future<List<NewUser>> findAllNewUsers() async => runSql<List<NewUser>>(
-    'SELECT * FROM Users',
-    mapper: (rows) => rows.map(NewUserMapper.fromRow).toList(),
-  );
+  Future<List<NewUser>> findAllNewUsers({bool includeDeleted = false}) async {
+    final String query =
+        includeDeleted
+            ? 'SELECT * FROM Users'
+            : 'SELECT * FROM Users WHERE deleted_at IS NULL';
+
+    return runSql<List<NewUser>>(
+      query,
+      mapper: (rows) => rows.map(NewUserMapper.fromRow).toList(),
+    );
+  }
 
   Future<List<NewUser>> findNewUsersWhere(
     String condition,
-    List<Object?> positionalParams,
-  ) async {
+    List<dynamic> positionalParams, {
+    bool includeDeleted = false,
+  }) async {
+    final String query =
+        includeDeleted
+            ? 'SELECT * FROM Users WHERE $condition'
+            : 'SELECT * FROM Users WHERE ($condition) AND deleted_at IS NULL';
+
     return runSql<List<NewUser>>(
-      'SELECT * FROM Users WHERE $condition',
+      query,
       positionalParams: positionalParams,
       mapper: (rows) => rows.map(NewUserMapper.fromRow).toList(),
     );
@@ -290,16 +309,31 @@ class NewUserCrudHelpers {
     await db.deleteNewUserWhere(field, value);
   }
 
-  static Future<List<NewUser>> findAll(SqlEngineDatabase db) async {
-    return await db.findAllNewUsers();
+  static Future<List<NewUser>> findAll(
+    SqlEngineDatabase db, {
+    bool includeDeleted = false,
+  }) async {
+    return await db.findAllNewUsers(includeDeleted: includeDeleted);
   }
 
   static Future<List<NewUser>> findWhere(
     SqlEngineDatabase db,
     String condition,
-    List<Object?> positionalParams,
-  ) async {
-    return await db.findNewUsersWhere(condition, positionalParams);
+    List<Object?> positionalParams, {
+    bool includeDeleted = false,
+  }) async {
+    return await db.findNewUsersWhere(
+      condition,
+      positionalParams,
+      includeDeleted: includeDeleted,
+    );
+  }
+
+  static Future<void> restoreById(SqlEngineDatabase db, dynamic id) async {
+    await db.runSql(
+      'UPDATE Users SET deleted_at = NULL WHERE id = ?',
+      positionalParams: <Object?>[id],
+    );
   }
 
   static Future<void> flush(SqlEngineDatabase db) async {

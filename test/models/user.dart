@@ -2,7 +2,7 @@ import 'package:sql_engine/sql_engine.dart';
 
 part 'user.g.dart';
 
-@SqlTable(tableName: 'users', version: 1)
+@SqlTable(tableName: 'users', version: 1, softDelete: true)
 @SqlSchema(
   version: 1,
   columns: <SqlColumn>[
@@ -21,10 +21,11 @@ part 'user.g.dart';
     ), // stored as 0/1
     SqlColumn(name: 'created_at', type: SqlType.date, nullable: true),
     SqlColumn(
-      name: 'data',
-      type: SqlType.blob,
+      name: 'deleted_at',
+      type: SqlType.date,
       nullable: true,
     ), // optional blob
+    SqlColumn(name: 'data', type: SqlType.blob, nullable: true),
   ],
 
   seedData: <Map<String, dynamic>>[
@@ -49,6 +50,13 @@ class User {
   final bool? male;
   final DateTime? createdAt;
   final List<int>? data;
-
-  User({required this.name, this.id, this.male, this.createdAt, this.data});
+  final DateTime? deletedAt;
+  User({
+    required this.name,
+    this.id,
+    this.male,
+    this.createdAt,
+    this.data,
+    this.deletedAt,
+  });
 }

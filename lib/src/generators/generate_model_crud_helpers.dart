@@ -8,9 +8,6 @@ String generateModelCrudHelpers({
 }) {
   final StringBuffer methodBuffer = StringBuffer();
 
-  // final String pkName = columns.firstWhere((SqlColumn c) => c.primaryKey).name;
-  // final String pkField = StringUtils.snakeToCamel(pkName);
-
   final List<SqlColumn> nonNullCols =
       columns.where((SqlColumn c) => !c.nullable).toList();
   final List<SqlColumn> nullableCols =
@@ -83,16 +80,26 @@ String generateModelCrudHelpers({
     await db.delete${className}Where(field, value);
   }
 
-  static Future<List<$className>> findAll(SqlEngineDatabase db) async {
-    return await db.findAll${className}s();
+  static Future<List<$className>> findAll(SqlEngineDatabase db, {bool includeDeleted = false}) async {
+    return await db.findAll${className}s(includeDeleted: includeDeleted);
   }
+
   static Future<List<$className>> findWhere(
     SqlEngineDatabase db,
     String condition,
-    List<Object?> positionalParams,
-  ) async {
-    return await db.find${className}sWhere(condition, positionalParams);
+    List<Object?> positionalParams, {
+    bool includeDeleted = false,
+  }) async {
+    return await db.find${className}sWhere(condition, positionalParams, includeDeleted: includeDeleted);
   }
+  
+  static Future<void> restoreById(SqlEngineDatabase db, dynamic id) async {
+    await db.runSql(
+      'UPDATE $tableName SET deleted_at = NULL WHERE id = ?',
+      positionalParams: <Object?>[id],
+    );
+  }
+
 
   static Future<void> flush(SqlEngineDatabase db) async {
     await db.flush${className}s();

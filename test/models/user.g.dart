@@ -20,6 +20,7 @@ class UserTable extends SqlEngineTable {
   name text NOT NULL,
   male boolean,
   created_at DATE,
+  deleted_at DATE,
   data blob
 );
 """,
@@ -42,6 +43,7 @@ class UserTable extends SqlEngineTable {
   name text NOT NULL,
   male boolean,
   created_at DATE,
+  deleted_at DATE,
   data blob
 );
 """;
@@ -59,6 +61,10 @@ extension UserMapper on User {
           row.containsKey('created_at') && row['created_at'] != null
               ? DateTime.fromMillisecondsSinceEpoch(row['created_at'] as int)
               : null,
+      deletedAt:
+          row.containsKey('deleted_at') && row['deleted_at'] != null
+              ? DateTime.fromMillisecondsSinceEpoch(row['deleted_at'] as int)
+              : null,
       data: row['data'] as List<int>?,
     );
   }
@@ -69,6 +75,7 @@ extension UserMapper on User {
       'name': name,
       'male': male == true ? 1 : null,
       'created_at': createdAt?.millisecondsSinceEpoch,
+      'deleted_at': deletedAt?.millisecondsSinceEpoch,
       'data': data,
     };
   }
@@ -78,38 +85,46 @@ extension UserCrud on SqlEngineDatabase {
   // INSERT ------------------------------------------------------------------
   Future<void> insertUser(User entity) async {
     await runSql(
-      'INSERT INTO users (id, name, male, created_at, data) VALUES (?, ?, ?, ?, ?)',
-      positionalParams: <Object?>[
+      'INSERT INTO users (id, name, male, created_at, deleted_at, data) VALUES (?, ?, ?, ?, ?, ?)',
+      positionalParams: <dynamic>[
         entity.id,
         entity.name,
         entity.male,
         entity.createdAt?.millisecondsSinceEpoch,
+        entity.deletedAt?.millisecondsSinceEpoch,
         entity.data,
       ],
     );
   }
 
   // DELETE ------------------------------------------------------------------
-  Future<int> deleteUserById(Object? id) async => runSql<int>(
-    'DELETE FROM users WHERE id = ?',
-    positionalParams: <Object?>[id],
+  Future<int> deleteUserById(dynamic id) async => runSql<int>(
+    'UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?',
+    positionalParams: <dynamic>[id],
   );
 
-  Future<int> deleteUserWhere(String field, Object? value) async => runSql<int>(
+  Future<int> deleteUserWhere(String field, dynamic value) async => runSql<int>(
     'DELETE FROM users WHERE $field = ?',
-    positionalParams: <Object?>[value],
+    positionalParams: <dynamic>[value],
   );
 
   Future<int> flushUsers() async => runSql<int>('DELETE FROM users');
 
+  // RESTORE ------------------------------------------------------------------
+  Future<int> restoreUserById(dynamic id) async => runSql<int>(
+    'UPDATE users SET deleted_at = NULL WHERE id = ?',
+    positionalParams: <dynamic>[id],
+  );
+
   // UPDATE ------------------------------------------------------------------
   Future<void> updateUser(User entity) async {
     await runSql(
-      'UPDATE users SET name = ?, male = ?, created_at = ?, data = ? WHERE id = ?',
-      positionalParams: <Object?>[
+      'UPDATE users SET name = ?, male = ?, created_at = ?, deleted_at = ?, data = ? WHERE id = ?',
+      positionalParams: <dynamic>[
         entity.name,
         entity.male,
         entity.createdAt?.millisecondsSinceEpoch,
+        entity.deletedAt?.millisecondsSinceEpoch,
         entity.data,
         entity.id,
       ],
@@ -119,34 +134,49 @@ extension UserCrud on SqlEngineDatabase {
   // UPSERT ------------------------------------------------------------------
   Future<void> upsertUser(User entity) async {
     await runSql(
-      'INSERT INTO users (id, name, male, created_at, data) VALUES (?, ?, ?, ?, ?) '
-      'ON CONFLICT(id) DO UPDATE SET name = ?, male = ?, created_at = ?, data = ?',
-      positionalParams: <Object?>[
+      'INSERT INTO users (id, name, male, created_at, deleted_at, data) VALUES (?, ?, ?, ?, ?, ?) '
+      'ON CONFLICT(id) DO UPDATE SET name = ?, male = ?, created_at = ?, deleted_at = ?, data = ?',
+      positionalParams: <dynamic>[
         entity.id,
         entity.name,
         entity.male,
         entity.createdAt?.millisecondsSinceEpoch,
+        entity.deletedAt?.millisecondsSinceEpoch,
         entity.data,
         entity.name,
         entity.male,
         entity.createdAt?.millisecondsSinceEpoch,
+        entity.deletedAt?.millisecondsSinceEpoch,
         entity.data,
       ],
     );
   }
 
   // SELECT ------------------------------------------------------------------
-  Future<List<User>> findAllUsers() async => runSql<List<User>>(
-    'SELECT * FROM users',
-    mapper: (rows) => rows.map(UserMapper.fromRow).toList(),
-  );
+  Future<List<User>> findAllUsers({bool includeDeleted = false}) async {
+    final String query =
+        includeDeleted
+            ? 'SELECT * FROM users'
+            : 'SELECT * FROM users WHERE deleted_at IS NULL';
+
+    return runSql<List<User>>(
+      query,
+      mapper: (rows) => rows.map(UserMapper.fromRow).toList(),
+    );
+  }
 
   Future<List<User>> findUsersWhere(
     String condition,
-    List<Object?> positionalParams,
-  ) async {
+    List<dynamic> positionalParams, {
+    bool includeDeleted = false,
+  }) async {
+    final String query =
+        includeDeleted
+            ? 'SELECT * FROM users WHERE $condition'
+            : 'SELECT * FROM users WHERE ($condition) AND deleted_at IS NULL';
+
     return runSql<List<User>>(
-      'SELECT * FROM users WHERE $condition',
+      query,
       positionalParams: positionalParams,
       mapper: (rows) => rows.map(UserMapper.fromRow).toList(),
     );
@@ -160,10 +190,18 @@ class UserCrudHelpers {
     required String name,
     bool? male,
     DateTime? createdAt,
+    DateTime? deletedAt,
     List<int>? data,
   }) async {
     await db.insertUser(
-      User(id: id, name: name, male: male, createdAt: createdAt, data: data),
+      User(
+        id: id,
+        name: name,
+        male: male,
+        createdAt: createdAt,
+        deletedAt: deletedAt,
+        data: data,
+      ),
     );
   }
 
@@ -173,10 +211,18 @@ class UserCrudHelpers {
     required String name,
     bool? male,
     DateTime? createdAt,
+    DateTime? deletedAt,
     List<int>? data,
   }) async {
     await db.updateUser(
-      User(id: id, name: name, male: male, createdAt: createdAt, data: data),
+      User(
+        id: id,
+        name: name,
+        male: male,
+        createdAt: createdAt,
+        deletedAt: deletedAt,
+        data: data,
+      ),
     );
   }
 
@@ -186,10 +232,18 @@ class UserCrudHelpers {
     required String name,
     bool? male,
     DateTime? createdAt,
+    DateTime? deletedAt,
     List<int>? data,
   }) async {
     await db.upsertUser(
-      User(id: id, name: name, male: male, createdAt: createdAt, data: data),
+      User(
+        id: id,
+        name: name,
+        male: male,
+        createdAt: createdAt,
+        deletedAt: deletedAt,
+        data: data,
+      ),
     );
   }
 
@@ -209,16 +263,31 @@ class UserCrudHelpers {
     await db.deleteUserWhere(field, value);
   }
 
-  static Future<List<User>> findAll(SqlEngineDatabase db) async {
-    return await db.findAllUsers();
+  static Future<List<User>> findAll(
+    SqlEngineDatabase db, {
+    bool includeDeleted = false,
+  }) async {
+    return await db.findAllUsers(includeDeleted: includeDeleted);
   }
 
   static Future<List<User>> findWhere(
     SqlEngineDatabase db,
     String condition,
-    List<Object?> positionalParams,
-  ) async {
-    return await db.findUsersWhere(condition, positionalParams);
+    List<Object?> positionalParams, {
+    bool includeDeleted = false,
+  }) async {
+    return await db.findUsersWhere(
+      condition,
+      positionalParams,
+      includeDeleted: includeDeleted,
+    );
+  }
+
+  static Future<void> restoreById(SqlEngineDatabase db, dynamic id) async {
+    await db.runSql(
+      'UPDATE users SET deleted_at = NULL WHERE id = ?',
+      positionalParams: <Object?>[id],
+    );
   }
 
   static Future<void> flush(SqlEngineDatabase db) async {

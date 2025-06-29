@@ -14,6 +14,7 @@ String generateSqlEngineTableClass({
   required List<SqlColumn> columns,
   required List<SqlSchema> schemas,
   List<String> createIndexes = const <String>[],
+  bool softDelete = false,
 }) {
   //
   final String migrationCode = generateMigrationCode(migrations);
@@ -32,6 +33,7 @@ String generateSqlEngineTableClass({
     originalClassName: originalClassName,
     tableName: tableName,
     columns: columns,
+    softDelete: softDelete,
   );
 
   //create indexSql for indexes

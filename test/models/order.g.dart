@@ -67,7 +67,7 @@ extension OrderCrud on SqlEngineDatabase {
   Future<void> insertOrder(Order entity) async {
     await runSql(
       'INSERT INTO orders (id, customer_id, order_date, total) VALUES (?, ?, ?, ?)',
-      positionalParams: <Object?>[
+      positionalParams: <dynamic>[
         entity.id,
         entity.customerId,
         entity.orderDate.millisecondsSinceEpoch,
@@ -77,24 +77,30 @@ extension OrderCrud on SqlEngineDatabase {
   }
 
   // DELETE ------------------------------------------------------------------
-  Future<int> deleteOrderById(Object? id) async => runSql<int>(
+  Future<int> deleteOrderById(dynamic id) async => runSql<int>(
     'DELETE FROM orders WHERE id = ?',
-    positionalParams: <Object?>[id],
+    positionalParams: <dynamic>[id],
   );
 
-  Future<int> deleteOrderWhere(String field, Object? value) async =>
+  Future<int> deleteOrderWhere(String field, dynamic value) async =>
       runSql<int>(
         'DELETE FROM orders WHERE $field = ?',
-        positionalParams: <Object?>[value],
+        positionalParams: <dynamic>[value],
       );
 
   Future<int> flushOrders() async => runSql<int>('DELETE FROM orders');
+
+  // RESTORE ------------------------------------------------------------------
+  Future<int> restoreOrderById(dynamic id) async => runSql<int>(
+    'UPDATE orders SET deleted_at = NULL WHERE id = ?',
+    positionalParams: <dynamic>[id],
+  );
 
   // UPDATE ------------------------------------------------------------------
   Future<void> updateOrder(Order entity) async {
     await runSql(
       'UPDATE orders SET customer_id = ?, order_date = ?, total = ? WHERE id = ?',
-      positionalParams: <Object?>[
+      positionalParams: <dynamic>[
         entity.customerId,
         entity.orderDate.millisecondsSinceEpoch,
         entity.total,
@@ -108,30 +114,43 @@ extension OrderCrud on SqlEngineDatabase {
     await runSql(
       'INSERT INTO orders (id, customer_id, order_date, total) VALUES (?, ?, ?, ?) '
       'ON CONFLICT(id) DO UPDATE SET customer_id = ?, order_date = ?, total = ?',
-      positionalParams: <Object?>[
+      positionalParams: <dynamic>[
         entity.id,
         entity.customerId,
         entity.orderDate.millisecondsSinceEpoch,
         entity.total,
         entity.customerId,
-        entity.orderDate.millisecondsSinceEpoch,
+        entity.orderDate?.millisecondsSinceEpoch,
         entity.total,
       ],
     );
   }
 
   // SELECT ------------------------------------------------------------------
-  Future<List<Order>> findAllOrders() async => runSql<List<Order>>(
-    'SELECT * FROM orders',
-    mapper: (rows) => rows.map(OrderMapper.fromRow).toList(),
-  );
+  Future<List<Order>> findAllOrders({bool includeDeleted = false}) async {
+    final String query =
+        includeDeleted
+            ? 'SELECT * FROM orders'
+            : 'SELECT * FROM orders WHERE deleted_at IS NULL';
+
+    return runSql<List<Order>>(
+      query,
+      mapper: (rows) => rows.map(OrderMapper.fromRow).toList(),
+    );
+  }
 
   Future<List<Order>> findOrdersWhere(
     String condition,
-    List<Object?> positionalParams,
-  ) async {
+    List<dynamic> positionalParams, {
+    bool includeDeleted = false,
+  }) async {
+    final String query =
+        includeDeleted
+            ? 'SELECT * FROM orders WHERE $condition'
+            : 'SELECT * FROM orders WHERE ($condition) AND deleted_at IS NULL';
+
     return runSql<List<Order>>(
-      'SELECT * FROM orders WHERE $condition',
+      query,
       positionalParams: positionalParams,
       mapper: (rows) => rows.map(OrderMapper.fromRow).toList(),
     );
@@ -191,16 +210,31 @@ class OrderCrudHelpers {
     await db.deleteOrderWhere(field, value);
   }
 
-  static Future<List<Order>> findAll(SqlEngineDatabase db) async {
-    return await db.findAllOrders();
+  static Future<List<Order>> findAll(
+    SqlEngineDatabase db, {
+    bool includeDeleted = false,
+  }) async {
+    return await db.findAllOrders(includeDeleted: includeDeleted);
   }
 
   static Future<List<Order>> findWhere(
     SqlEngineDatabase db,
     String condition,
-    List<Object?> positionalParams,
-  ) async {
-    return await db.findOrdersWhere(condition, positionalParams);
+    List<Object?> positionalParams, {
+    bool includeDeleted = false,
+  }) async {
+    return await db.findOrdersWhere(
+      condition,
+      positionalParams,
+      includeDeleted: includeDeleted,
+    );
+  }
+
+  static Future<void> restoreById(SqlEngineDatabase db, dynamic id) async {
+    await db.runSql(
+      'UPDATE orders SET deleted_at = NULL WHERE id = ?',
+      positionalParams: <Object?>[id],
+    );
   }
 
   static Future<void> flush(SqlEngineDatabase db) async {

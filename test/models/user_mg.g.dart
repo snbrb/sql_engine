@@ -72,29 +72,35 @@ extension UserMgCrud on SqlEngineDatabase {
   Future<void> insertUserMg(UserMg entity) async {
     await runSql(
       'INSERT INTO user_mg (id, full_name, email) VALUES (?, ?, ?)',
-      positionalParams: <Object?>[entity.id, entity.fullName, entity.email],
+      positionalParams: <dynamic>[entity.id, entity.fullName, entity.email],
     );
   }
 
   // DELETE ------------------------------------------------------------------
-  Future<int> deleteUserMgById(Object? id) async => runSql<int>(
+  Future<int> deleteUserMgById(dynamic id) async => runSql<int>(
     'DELETE FROM user_mg WHERE id = ?',
-    positionalParams: <Object?>[id],
+    positionalParams: <dynamic>[id],
   );
 
-  Future<int> deleteUserMgWhere(String field, Object? value) async =>
+  Future<int> deleteUserMgWhere(String field, dynamic value) async =>
       runSql<int>(
         'DELETE FROM user_mg WHERE $field = ?',
-        positionalParams: <Object?>[value],
+        positionalParams: <dynamic>[value],
       );
 
   Future<int> flushUserMgs() async => runSql<int>('DELETE FROM user_mg');
+
+  // RESTORE ------------------------------------------------------------------
+  Future<int> restoreUserMgById(dynamic id) async => runSql<int>(
+    'UPDATE user_mg SET deleted_at = NULL WHERE id = ?',
+    positionalParams: <dynamic>[id],
+  );
 
   // UPDATE ------------------------------------------------------------------
   Future<void> updateUserMg(UserMg entity) async {
     await runSql(
       'UPDATE user_mg SET full_name = ?, email = ? WHERE id = ?',
-      positionalParams: <Object?>[entity.fullName, entity.email, entity.id],
+      positionalParams: <dynamic>[entity.fullName, entity.email, entity.id],
     );
   }
 
@@ -103,7 +109,7 @@ extension UserMgCrud on SqlEngineDatabase {
     await runSql(
       'INSERT INTO user_mg (id, full_name, email) VALUES (?, ?, ?) '
       'ON CONFLICT(id) DO UPDATE SET full_name = ?, email = ?',
-      positionalParams: <Object?>[
+      positionalParams: <dynamic>[
         entity.id,
         entity.fullName,
         entity.email,
@@ -114,17 +120,30 @@ extension UserMgCrud on SqlEngineDatabase {
   }
 
   // SELECT ------------------------------------------------------------------
-  Future<List<UserMg>> findAllUserMgs() async => runSql<List<UserMg>>(
-    'SELECT * FROM user_mg',
-    mapper: (rows) => rows.map(UserMgMapper.fromRow).toList(),
-  );
+  Future<List<UserMg>> findAllUserMgs({bool includeDeleted = false}) async {
+    final String query =
+        includeDeleted
+            ? 'SELECT * FROM user_mg'
+            : 'SELECT * FROM user_mg WHERE deleted_at IS NULL';
+
+    return runSql<List<UserMg>>(
+      query,
+      mapper: (rows) => rows.map(UserMgMapper.fromRow).toList(),
+    );
+  }
 
   Future<List<UserMg>> findUserMgsWhere(
     String condition,
-    List<Object?> positionalParams,
-  ) async {
+    List<dynamic> positionalParams, {
+    bool includeDeleted = false,
+  }) async {
+    final String query =
+        includeDeleted
+            ? 'SELECT * FROM user_mg WHERE $condition'
+            : 'SELECT * FROM user_mg WHERE ($condition) AND deleted_at IS NULL';
+
     return runSql<List<UserMg>>(
-      'SELECT * FROM user_mg WHERE $condition',
+      query,
       positionalParams: positionalParams,
       mapper: (rows) => rows.map(UserMgMapper.fromRow).toList(),
     );
@@ -175,16 +194,31 @@ class UserMgCrudHelpers {
     await db.deleteUserMgWhere(field, value);
   }
 
-  static Future<List<UserMg>> findAll(SqlEngineDatabase db) async {
-    return await db.findAllUserMgs();
+  static Future<List<UserMg>> findAll(
+    SqlEngineDatabase db, {
+    bool includeDeleted = false,
+  }) async {
+    return await db.findAllUserMgs(includeDeleted: includeDeleted);
   }
 
   static Future<List<UserMg>> findWhere(
     SqlEngineDatabase db,
     String condition,
-    List<Object?> positionalParams,
-  ) async {
-    return await db.findUserMgsWhere(condition, positionalParams);
+    List<Object?> positionalParams, {
+    bool includeDeleted = false,
+  }) async {
+    return await db.findUserMgsWhere(
+      condition,
+      positionalParams,
+      includeDeleted: includeDeleted,
+    );
+  }
+
+  static Future<void> restoreById(SqlEngineDatabase db, dynamic id) async {
+    await db.runSql(
+      'UPDATE user_mg SET deleted_at = NULL WHERE id = ?',
+      positionalParams: <Object?>[id],
+    );
   }
 
   static Future<void> flush(SqlEngineDatabase db) async {

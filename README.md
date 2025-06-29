@@ -15,11 +15,38 @@
     1. *Low‑level* `SqlEngineDatabase` – explicit registration.
     2. *Drift‑style* `@SqlDatabase` – one annotation, everything wired for you.
 - **Model mapping** – `fromRow` / `toRow` helpers are generated for each table.
-- **🔁 Generated CRUD helpers** – just call `UserCrudHelpers.insert(...)` with named args.
+- **Generated CRUD helpers** – just call `UserCrudHelpers.insert(...)` with named args.
 - **No mirrors, no hidden allocations** – works on Flutter, server, CLI, Wasm.
 
 ---
 
+
+
+## Soft Delete Support (2.0.4)
+To include softDelete on a tabale annotate the table 
+@SqlTable(tableName: 'users', version: 1, softDelete: true)
+and your table should include `deleted_at`  column (`SqlType.date`) 
+the generator enables soft delete behavior:
+
+- `deleteById()` sets `deleted_at = CURRENT_TIMESTAMP`
+- `findAll()` and `findWhere()` skip deleted rows by default
+- `restoreById()` resets `deleted_at = NULL` to undelete the row
+- Pass `includeDeleted: true` to include deleted rows in queries
+- refer to test in test/soft_delete_test.dart
+
+### Example
+
+```dart
+await UserCrudHelpers.deleteById(db, 2);
+
+final active = await UserCrudHelpers.findAll(db);
+final all = await UserCrudHelpers.findAll(db, includeDeleted: true);
+
+await UserCrudHelpers.restoreById(db, 2);
+```
+
+`restoreById` is used in a soft delete system to "undo" a deletion by clearing the deleted_at timestamp for a specific record. 
+---
 
 ##  NEW in 2.0.3: Initial Seed Data
 

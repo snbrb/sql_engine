@@ -1,3 +1,35 @@
+## [2.0.4] – 2025-06-29
+
+###  Added
+
+- **Soft Delete Support**
+  - You can now enable soft deletion using `@SqlTable(softDelete: true)`.
+    ```dart
+    @SqlTable(tableName: 'users', version: 1, softDelete: true)
+    class User { ... }
+    ```
+  - When enabled:
+    - All `deleteById()` operations update `deleted_at = CURRENT_TIMESTAMP` instead of removing rows.
+    - All `findAll()` and `findWhere()` queries automatically **exclude soft-deleted rows** by default.
+    - Use `includeDeleted: true` to include them.
+    - A new helper `restoreById()` is generated to restore soft-deleted rows.
+  - Supports:
+    - Nullable `deleted_at` column (added automatically if missing)
+    - Standard SQLite timestamp
+    - Reversible deletes via `restoreById()`
+
+  #### Example
+  ```dart
+  await UserCrudHelpers.deleteById(db, 5); // sets deleted_at
+  await UserCrudHelpers.findAll(db); // excludes deleted
+  await UserCrudHelpers.findAll(db, includeDeleted: true); // includes deleted
+  await UserCrudHelpers.restoreById(db, 5); // restores record
+  ```
+
+  > Fully tested under `test/soft_delete_test.dart` — including restore and manual inspection via raw SQL.
+
+
+
 ## [2.0.3] - 2025-06-12
 
 ###  Added

@@ -4,12 +4,11 @@
 import '../../sql_engine.dart';
 import '../utils/string_utils.dart';
 
-/// Generates a `SqlEngineDatabase` extension with strongly-typed
-/// CRUD helpers for a single model/table.
 String generateCrudMethods({
   required String originalClassName,
   required String tableName,
   required List<SqlColumn> columns,
+  required bool softDelete,
 }) {
   final String pkName =
       columns
@@ -19,44 +18,39 @@ String generateCrudMethods({
           )
           .name;
 
-  // SQL insert clause
   final String csvColumnNames = columns.map((SqlColumn c) => c.name).join(', ');
   final String csvPlaceholders = List<dynamic>.filled(
     columns.length,
     '?',
   ).join(', ');
 
-  // INSERT positional values
   final String positionalFromEntity = columns
       .map((SqlColumn c) {
-        final String dartField = 'entity.${StringUtils.snakeToCamel(c.name)}';
-        if (c.type == SqlType.date) {
-          final String accessor =
-              c.nullable
-                  ? '$dartField?.millisecondsSinceEpoch'
-                  : '$dartField.millisecondsSinceEpoch';
-          return accessor;
-        }
-        return dartField;
+        final String field = 'entity.${StringUtils.snakeToCamel(c.name)}';
+        return c.type == SqlType.date
+            ? (c.nullable
+                ? '$field?.millisecondsSinceEpoch'
+                : '$field.millisecondsSinceEpoch')
+            : field;
       })
       .join(',\n        ');
 
-  // UPDATE clause
   final List<SqlColumn> nonPk =
       columns.where((SqlColumn c) => !c.primaryKey).toList();
+
   final String setClause = nonPk
       .map((SqlColumn c) => '${c.name} = ?')
       .join(', ');
+
   final String positionalUpdate = <String>[
     for (final SqlColumn c in nonPk)
       () {
-        final String dartField = 'entity.${StringUtils.snakeToCamel(c.name)}';
-        if (c.type == SqlType.date) {
-          return c.nullable
-              ? '$dartField?.millisecondsSinceEpoch'
-              : '$dartField.millisecondsSinceEpoch';
-        }
-        return dartField;
+        final String field = 'entity.${StringUtils.snakeToCamel(c.name)}';
+        return c.type == SqlType.date
+            ? (c.nullable
+                ? '$field?.millisecondsSinceEpoch'
+                : '$field.millisecondsSinceEpoch')
+            : field;
       }(),
     'entity.${StringUtils.snakeToCamel(pkName)}',
   ].join(',\n        ');
@@ -68,69 +62,87 @@ extension ${originalClassName}Crud on SqlEngineDatabase {
   Future<void> insert$originalClassName($originalClassName entity) async {
     await runSql(
       'INSERT INTO $tableName ($csvColumnNames) VALUES ($csvPlaceholders)',
-      positionalParams: <Object?>[
+      positionalParams: <dynamic>[
         $positionalFromEntity
       ],
     );
   }
 
   // DELETE ------------------------------------------------------------------
-  Future<int> delete${originalClassName}ById(Object? id) async =>
+  Future<int> delete${originalClassName}ById(dynamic id) async =>
       runSql<int>(
-        'DELETE FROM $tableName WHERE $pkName = ?',
-        positionalParams: <Object?>[id],
+        ${softDelete ? "'UPDATE $tableName SET deleted_at = CURRENT_TIMESTAMP WHERE $pkName = ?'" : "'DELETE FROM $tableName WHERE $pkName = ?'"},
+        positionalParams: <dynamic>[id],
       );
 
-  Future<int> delete${originalClassName}Where(String field, Object? value) async =>
+  Future<int> delete${originalClassName}Where(String field, dynamic value) async =>
       runSql<int>(
         'DELETE FROM $tableName WHERE \$field = ?',
-        positionalParams: <Object?>[value],
+        positionalParams: <dynamic>[value],
       );
 
   Future<int> flush${originalClassName}s() async =>
       runSql<int>('DELETE FROM $tableName');
 
+  // RESTORE ------------------------------------------------------------------
+  Future<int> restore${originalClassName}ById(dynamic id) async =>
+      runSql<int>(
+        'UPDATE $tableName SET deleted_at = NULL WHERE $pkName = ?',
+        positionalParams: <dynamic>[id],
+      );
+
   // UPDATE ------------------------------------------------------------------
   Future<void> update$originalClassName($originalClassName entity) async {
     await runSql(
       'UPDATE $tableName SET $setClause WHERE $pkName = ?',
-      positionalParams: <Object?>[
+      positionalParams: <dynamic>[
         $positionalUpdate
       ],
     );
   }
 
- // UPSERT ------------------------------------------------------------------
-Future<void> upsert$originalClassName($originalClassName entity) async {
-  await runSql(
-    'INSERT INTO $tableName ($csvColumnNames) VALUES ($csvPlaceholders) '
-    'ON CONFLICT($pkName) DO UPDATE SET $setClause',
-    positionalParams: <Object?>[
-      $positionalFromEntity,
-      ${nonPk.map((SqlColumn c) {
+  // UPSERT ------------------------------------------------------------------
+  Future<void> upsert$originalClassName($originalClassName entity) async {
+    await runSql(
+      'INSERT INTO $tableName ($csvColumnNames) VALUES ($csvPlaceholders) '
+      'ON CONFLICT($pkName) DO UPDATE SET $setClause',
+      positionalParams: <dynamic>[
+        $positionalFromEntity,
+        ${nonPk.map((SqlColumn c) {
     final String field = 'entity.${StringUtils.snakeToCamel(c.name)}';
     return c.type == SqlType.date ? '$field?.millisecondsSinceEpoch' : field;
-  }).join(',\n      ')}
-    ],
-  );
-}
-
+  }).join(',\n        ')}
+      ],
+    );
+  }
 
   // SELECT ------------------------------------------------------------------
-  Future<List<$originalClassName>> findAll${originalClassName}s() async =>
-      runSql<List<$originalClassName>>(
-        'SELECT * FROM $tableName',
-        mapper: (rows) => rows.map(${originalClassName}Mapper.fromRow).toList(),
-      );
+  Future<List<$originalClassName>> findAll${originalClassName}s({bool includeDeleted = false}) async {
+    final String query = includeDeleted
+      ? 'SELECT * FROM $tableName'
+      : 'SELECT * FROM $tableName WHERE deleted_at IS NULL';
 
-Future<List<$originalClassName>> find${originalClassName}sWhere(
-    String condition, List<Object?> positionalParams) async {
-  return runSql<List<$originalClassName>>(
-    'SELECT * FROM $tableName WHERE \$condition',
-    positionalParams: positionalParams,
-    mapper: (rows) => rows.map(${originalClassName}Mapper.fromRow).toList(),
-  );
-}
+    return runSql<List<$originalClassName>>(
+      query,
+      mapper: (rows) => rows.map(${originalClassName}Mapper.fromRow).toList(),
+    );
+  }
+
+  Future<List<$originalClassName>> find${originalClassName}sWhere(
+    String condition,
+    List<dynamic> positionalParams, {
+    bool includeDeleted = false,
+  }) async {
+    final String query = includeDeleted
+      ? 'SELECT * FROM $tableName WHERE \$condition'
+      : 'SELECT * FROM $tableName WHERE (\$condition) AND deleted_at IS NULL';
+
+    return runSql<List<$originalClassName>>(
+      query,
+      positionalParams: positionalParams,
+      mapper: (rows) => rows.map(${originalClassName}Mapper.fromRow).toList(),
+    );
+  }
 
 }
 ''';

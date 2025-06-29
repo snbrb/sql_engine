@@ -32,6 +32,8 @@ class SqlEngineGenerator extends GeneratorForAnnotation<SqlTable> {
     final ClassElement classElement = element;
     final String className = classElement.name;
     final String tableName = annotation.read('tableName').stringValue;
+    final bool softDelete = annotation.read('softDelete').boolValue;
+
     //final int version = annotation.read('version').intValue;
 
     // 2) Get all schema versions.
@@ -55,6 +57,20 @@ class SqlEngineGenerator extends GeneratorForAnnotation<SqlTable> {
 
     final List<SqlColumn> columns = latest.columns;
 
+    // ✅ Validate `deleted_at` presence if softDelete is true
+    if (softDelete) {
+      final bool hasDeletedAt = columns.any(
+        (SqlColumn c) => c.name == 'deleted_at',
+      );
+      if (!hasDeletedAt) {
+        throw InvalidGenerationSourceError(
+          'Table "$tableName" is marked with softDelete: true, '
+          'but is missing a "deleted_at" column.',
+          element: classElement,
+        );
+      }
+    }
+
     // handle indexes
     final List<SqlIndex> indexes = extractSqlIndexes(classElement);
     final List<String> createIndexes = generateIndexStatements(
@@ -72,6 +88,7 @@ class SqlEngineGenerator extends GeneratorForAnnotation<SqlTable> {
       columns: columns,
       schemas: schemas,
       createIndexes: createIndexes,
+      softDelete: softDelete,
     );
 
     return output;

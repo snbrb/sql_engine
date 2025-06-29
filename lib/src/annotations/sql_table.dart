@@ -6,5 +6,11 @@ class SqlTable {
   /// The current version of the table schema
   final int version;
 
-  const SqlTable({required this.tableName, required this.version});
+  final bool softDelete;
+
+  const SqlTable({
+    required this.tableName,
+    required this.version,
+    this.softDelete = false,
+  });
 }
