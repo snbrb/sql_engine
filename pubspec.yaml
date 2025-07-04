@@ -1,6 +1,6 @@
 name: sql_engine
 description: A thin yet powerful SQLite layer for Dart & Flutter.
-version: 2.0.4
+version: 2.0.5
 homepage: https://github.com/snbrb/sql_engine
 repository: https://github.com/snbrb/sql_engine
 issue_tracker: https://github.com/snbrb/sql_engine/issues
@@ -18,7 +18,7 @@ dependencies:
   path: ^1.9.1
   source_gen: ^2.0.0
   sqlite3: ^2.7.6
-  sqlite3_flutter_libs: ^0.5.33
+  sqlite3_flutter_libs: ^0.5.34
   sqlite3_web: ^0.3.1
 
 dev_dependencies:

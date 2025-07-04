@@ -1,3 +1,41 @@
+## [2.0.5] – 2025-07-05
+
+### Added
+
+* **Binary Serialization Helpers (`toBytes` / `fromBytes`)**  
+  Every generated model now includes a zero‑allocation binary codec:
+
+  ```dart
+  final bytes = user.toBytes();          // → Uint8List
+  final user2 = UserBinary.fromBytes(bytes);
+  ```
+
+  * Column order follows the latest `@SqlSchema`.
+  * Little‑endian layout with compact variable‑length encoding for `String` and `BLOB`.
+  * Nullable columns use a one‑byte presence flag (0 / 1).
+  * Fully type‑safe – `DateTime` stored as `int64` milliseconds, `bool` as `0/1`.
+  * Thorough test‑suite (`test/binary_codec_test.dart`) covers:
+    * Round‑trip of all field types
+    * Nullable vs non‑nullable columns
+    * Edge‑cases: empty strings/blobs, max/min numeric values, very long payloads.
+
+  #### Example
+  ```dart
+  final order = Order(
+    id: 9,
+    customerId: 42,
+    orderDate: DateTime.utc(2025, 7, 1, 18),
+    total: 123.45,
+  );
+
+  final data = order.toBytes();          // serialize
+  final copy = OrderBinary.fromBytes(data);
+
+  assert(copy.total == 123.45);          // 
+  ```
+
+
+
 ## [2.0.4] – 2025-06-29
 
 ###  Added

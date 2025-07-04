@@ -18,6 +18,24 @@
 - **Generated CRUD helpers** – just call `UserCrudHelpers.insert(...)` with named args.
 - **No mirrors, no hidden allocations** – works on Flutter, server, CLI, Wasm.
 
+
+---
+
+
+### Raw bytes helpers *(v 2.0.5)*
+
+New `toBytes()` / `fromBytes()` extension methods are now generated for every model. They serialize a row to a compact `Uint8List` and restore it back – perfect for binary caches, isolate transfers, or network blobs.
+
+```dart
+final bytes = user.toBytes();        //  Uint8List
+await someCache.put('u1', bytes);
+
+final raw   = await someCache.get('u1');
+final user2 = User.fromBytes(raw);   // deep-equal to original
+```
+
+Under the hood, the generator packs non-null fields only and writes via `ByteData` for **zero-allocation** encoding.
+
 ---
 
 

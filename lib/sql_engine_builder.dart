@@ -21,6 +21,6 @@ Builder sqlEngineBuilder(BuilderOptions options) => PartBuilder(
   '.g.dart', //generated/.mapped_database.g.dart//.mapped_database.g.dart
   header: '''
           // GENERATED CODE - DO NOT MODIFY BY HAND
-          // ignore_for_file: type=lint, unnecessary_brace_in_string_interps,  unused_element, unnecessary_null_comparison
+          // ignore_for_file: type=lint, unnecessary_brace_in_string_interps,  unused_element, unnecessary_null_comparison, unnecessary_cast, invalid_null_aware_operator
     ''',
 );
