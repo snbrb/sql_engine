@@ -266,3 +266,86 @@ class OrderItemCrudHelpers {
     await db.flushOrderItems();
   }
 }
+
+extension OrderItemBinary on OrderItem {
+  // ---- helpers -----------------------------------------------------------
+  static Uint8List _i32(int v) {
+    final b = ByteData(4)..setInt32(0, v, Endian.little);
+    return b.buffer.asUint8List();
+  }
+
+  static Uint8List _i64(int v) {
+    final b = ByteData(8)..setInt64(0, v, Endian.little);
+    return b.buffer.asUint8List();
+  }
+
+  static Uint8List _f64(double v) {
+    final b = ByteData(8)..setFloat64(0, v, Endian.little);
+    return b.buffer.asUint8List();
+  }
+
+  // ---- encode ------------------------------------------------------------
+  Uint8List toBytes() {
+    final buf = BytesBuilder();
+    // int id
+    buf.add(_i64(this.id as int));
+    // int order_id
+    buf.add(_i64(this.orderId as int));
+    // string product_name
+    final List<int> _b2 = utf8.encode(this.productName as String);
+    buf.add(_i32(_b2.length));
+    buf.add(_b2);
+    // int quantity
+    buf.add(_i64(this.quantity as int));
+    // double price
+    buf.add(_f64(this.price as double));
+
+    return buf.takeBytes();
+  }
+
+  // ---- decode ------------------------------------------------------------
+  static OrderItem fromBytes(Uint8List input) {
+    final bv = input.buffer.asByteData();
+    int _ofs = 0;
+    int _next() => input[_ofs++]; // 1 byte shortcut
+    int _readI32() {
+      final v = bv.getInt32(_ofs, Endian.little);
+      _ofs += 4;
+      return v;
+    }
+
+    int _readI64() {
+      final v = bv.getInt64(_ofs, Endian.little);
+      _ofs += 8;
+      return v;
+    }
+
+    double _readF64() {
+      final v = bv.getFloat64(_ofs, Endian.little);
+      _ofs += 8;
+      return v;
+    }
+
+    late int id;
+    late int orderId;
+    late String productName;
+    late int quantity;
+    late double price;
+
+    id = _readI64();
+    orderId = _readI64();
+    final int _len2 = _readI32();
+    productName = utf8.decode(input.sublist(_ofs, _ofs + _len2));
+    _ofs += _len2;
+    quantity = _readI64();
+    price = _readF64();
+
+    return OrderItem(
+      id: id,
+      orderId: orderId,
+      productName: productName,
+      quantity: quantity,
+      price: price,
+    );
+  }
+}

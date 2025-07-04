@@ -1,5 +1,6 @@
 import '../../sql_engine.dart';
 import 'extract_sql_create_table_query.dart';
+import 'generate_binary_serializer.dart';
 import 'generate_crud_methods.dart';
 import 'generate_mapper_extension.dart';
 import 'generate_migration_code.dart';
@@ -49,6 +50,7 @@ String generateSqlEngineTableClass({
 
   final SqlSchema latestSchema = schemas.last;
   final String initialSeedData = generateSeedData(latestSchema.seedData);
+  final String binaryExt = generateBinarySerializer(originalClassName, columns);
 
   return '''
 // GENERATED CODE - DO NOT MODIFY BY HAND
@@ -80,5 +82,6 @@ class ${originalClassName}Table extends SqlEngineTable {
 $mapperExtension
 $crudMethods
 $crudHelpers
+$binaryExt
 ''';
 }

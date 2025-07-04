@@ -124,7 +124,7 @@ extension OrderCrud on SqlEngineDatabase {
         entity.orderDate.millisecondsSinceEpoch,
         entity.total,
         entity.customerId,
-        entity.orderDate.millisecondsSinceEpoch,
+        entity.orderDate?.millisecondsSinceEpoch,
         entity.total,
       ],
     );
@@ -237,5 +237,79 @@ class OrderCrudHelpers {
 
   static Future<void> flush(SqlEngineDatabase db) async {
     await db.flushOrders();
+  }
+}
+
+extension OrderBinary on Order {
+  // ---- helpers -----------------------------------------------------------
+  static Uint8List _i32(int v) {
+    final b = ByteData(4)..setInt32(0, v, Endian.little);
+    return b.buffer.asUint8List();
+  }
+
+  static Uint8List _i64(int v) {
+    final b = ByteData(8)..setInt64(0, v, Endian.little);
+    return b.buffer.asUint8List();
+  }
+
+  static Uint8List _f64(double v) {
+    final b = ByteData(8)..setFloat64(0, v, Endian.little);
+    return b.buffer.asUint8List();
+  }
+
+  // ---- encode ------------------------------------------------------------
+  Uint8List toBytes() {
+    final buf = BytesBuilder();
+    // int id
+    buf.add(_i64(this.id as int));
+    // int customer_id
+    buf.add(_i64(this.customerId as int));
+    // DateTime order_date  → int64
+    buf.add(_i64((this.orderDate as DateTime).millisecondsSinceEpoch));
+    // double total
+    buf.add(_f64(this.total as double));
+
+    return buf.takeBytes();
+  }
+
+  // ---- decode ------------------------------------------------------------
+  static Order fromBytes(Uint8List input) {
+    final bv = input.buffer.asByteData();
+    int _ofs = 0;
+    int _next() => input[_ofs++]; // 1 byte shortcut
+    int _readI32() {
+      final v = bv.getInt32(_ofs, Endian.little);
+      _ofs += 4;
+      return v;
+    }
+
+    int _readI64() {
+      final v = bv.getInt64(_ofs, Endian.little);
+      _ofs += 8;
+      return v;
+    }
+
+    double _readF64() {
+      final v = bv.getFloat64(_ofs, Endian.little);
+      _ofs += 8;
+      return v;
+    }
+
+    late int id;
+    late int customerId;
+    late DateTime orderDate;
+    late double total;
+
+    id = _readI64();
+    customerId = _readI64();
+    orderDate = DateTime.fromMillisecondsSinceEpoch(_readI64());
+    total = _readF64();
+
+    return Order(
+      id: id,
+      customerId: customerId,
+      orderDate: orderDate,
+      total: total,
+    );
   }
 }

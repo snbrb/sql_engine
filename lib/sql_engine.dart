@@ -1,3 +1,7 @@
+// Re-export dart core libraries
+export 'dart:convert';
+export 'dart:typed_data';
+
 export 'src/annotations/sql_column.dart';
 export 'src/annotations/sql_database.dart';
 export 'src/annotations/sql_index.dart';

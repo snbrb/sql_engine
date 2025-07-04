@@ -302,3 +302,122 @@ class UserCrudHelpers {
     await db.flushUsers();
   }
 }
+
+extension UserBinary on User {
+  // ---- helpers -----------------------------------------------------------
+  static Uint8List _i32(int v) {
+    final b = ByteData(4)..setInt32(0, v, Endian.little);
+    return b.buffer.asUint8List();
+  }
+
+  static Uint8List _i64(int v) {
+    final b = ByteData(8)..setInt64(0, v, Endian.little);
+    return b.buffer.asUint8List();
+  }
+
+  static Uint8List _f64(double v) {
+    final b = ByteData(8)..setFloat64(0, v, Endian.little);
+    return b.buffer.asUint8List();
+  }
+
+  // ---- encode ------------------------------------------------------------
+  Uint8List toBytes() {
+    final buf = BytesBuilder();
+    // int id
+    buf.add(_i64(this.id as int));
+    // string name
+    final List<int> _b1 = utf8.encode(this.name as String);
+    buf.add(_i32(_b1.length));
+    buf.add(_b1);
+    // nullable male
+    if (this.male != null) {
+      buf.addByte(1); // bool male
+      buf.addByte(this.male == true ? 1 : 0);
+    } else {
+      buf.addByte(0);
+    }
+    // nullable created_at
+    if (this.createdAt != null) {
+      buf.addByte(1); // DateTime created_at  → int64
+      buf.add(_i64((this.createdAt as DateTime).millisecondsSinceEpoch));
+    } else {
+      buf.addByte(0);
+    }
+    // nullable deleted_at
+    if (this.deletedAt != null) {
+      buf.addByte(1); // DateTime deleted_at  → int64
+      buf.add(_i64((this.deletedAt as DateTime).millisecondsSinceEpoch));
+    } else {
+      buf.addByte(0);
+    }
+    // nullable data
+    if (this.data != null) {
+      buf.addByte(1); // blob data
+      buf.add(_i32((this.data as List<int>).length));
+      buf.add(this.data as List<int>);
+    } else {
+      buf.addByte(0);
+    }
+
+    return buf.takeBytes();
+  }
+
+  // ---- decode ------------------------------------------------------------
+  static User fromBytes(Uint8List input) {
+    final bv = input.buffer.asByteData();
+    int _ofs = 0;
+    int _next() => input[_ofs++]; // 1 byte shortcut
+    int _readI32() {
+      final v = bv.getInt32(_ofs, Endian.little);
+      _ofs += 4;
+      return v;
+    }
+
+    int _readI64() {
+      final v = bv.getInt64(_ofs, Endian.little);
+      _ofs += 8;
+      return v;
+    }
+
+    double _readF64() {
+      final v = bv.getFloat64(_ofs, Endian.little);
+      _ofs += 8;
+      return v;
+    }
+
+    late int id;
+    late String name;
+    bool? male;
+    DateTime? createdAt;
+    DateTime? deletedAt;
+    List<int>? data;
+
+    id = _readI64();
+    final int _len1 = _readI32();
+    name = utf8.decode(input.sublist(_ofs, _ofs + _len1));
+    _ofs += _len1;
+    if (_next() == 1) {
+      male = _next() == 1;
+    }
+    if (_next() == 1) {
+      createdAt = DateTime.fromMillisecondsSinceEpoch(_readI64());
+    }
+    if (_next() == 1) {
+      deletedAt = DateTime.fromMillisecondsSinceEpoch(_readI64());
+    }
+    if (_next() == 1) {
+      final int _len5 = _readI32();
+      data = input.sublist(_ofs, _ofs + _len5);
+      _ofs += _len5;
+    }
+
+    return User(
+      id: id,
+      name: name,
+      male: male,
+      createdAt: createdAt,
+      deletedAt: deletedAt,
+      data: data,
+    );
+  }
+}

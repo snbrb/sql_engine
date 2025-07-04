@@ -334,3 +334,175 @@ class NewUserCrudHelpers {
     await db.flushNewUsers();
   }
 }
+
+extension NewUserBinary on NewUser {
+  // ---- helpers -----------------------------------------------------------
+  static Uint8List _i32(int v) {
+    final b = ByteData(4)..setInt32(0, v, Endian.little);
+    return b.buffer.asUint8List();
+  }
+
+  static Uint8List _i64(int v) {
+    final b = ByteData(8)..setInt64(0, v, Endian.little);
+    return b.buffer.asUint8List();
+  }
+
+  static Uint8List _f64(double v) {
+    final b = ByteData(8)..setFloat64(0, v, Endian.little);
+    return b.buffer.asUint8List();
+  }
+
+  // ---- encode ------------------------------------------------------------
+  Uint8List toBytes() {
+    final buf = BytesBuilder();
+    // string uid
+    final List<int> _b0 = utf8.encode(this.uid as String);
+    buf.add(_i32(_b0.length));
+    buf.add(_b0);
+    // string displayName
+    final List<int> _b1 = utf8.encode(this.displayName as String);
+    buf.add(_i32(_b1.length));
+    buf.add(_b1);
+    // nullable profilePhotoUrl
+    if (this.profilePhotoUrl != null) {
+      buf.addByte(1); // string profilePhotoUrl
+      final List<int> _b2 = utf8.encode(this.profilePhotoUrl as String);
+      buf.add(_i32(_b2.length));
+      buf.add(_b2);
+    } else {
+      buf.addByte(0);
+    }
+    // nullable locationLat
+    if (this.locationLat != null) {
+      buf.addByte(1); // double locationLat
+      buf.add(_f64(this.locationLat as double));
+    } else {
+      buf.addByte(0);
+    }
+    // nullable locationLng
+    if (this.locationLng != null) {
+      buf.addByte(1); // double locationLng
+      buf.add(_f64(this.locationLng as double));
+    } else {
+      buf.addByte(0);
+    }
+    // nullable voipToken
+    if (this.voipToken != null) {
+      buf.addByte(1); // string voipToken
+      final List<int> _b5 = utf8.encode(this.voipToken as String);
+      buf.add(_i32(_b5.length));
+      buf.add(_b5);
+    } else {
+      buf.addByte(0);
+    }
+    // nullable platform
+    if (this.platform != null) {
+      buf.addByte(1); // string platform
+      final List<int> _b6 = utf8.encode(this.platform as String);
+      buf.add(_i32(_b6.length));
+      buf.add(_b6);
+    } else {
+      buf.addByte(0);
+    }
+    // nullable firebaseToken
+    if (this.firebaseToken != null) {
+      buf.addByte(1); // string firebaseToken
+      final List<int> _b7 = utf8.encode(this.firebaseToken as String);
+      buf.add(_i32(_b7.length));
+      buf.add(_b7);
+    } else {
+      buf.addByte(0);
+    }
+    // nullable lastUpdated
+    if (this.lastUpdated != null) {
+      buf.addByte(1); // int lastUpdated
+      buf.add(_i64(this.lastUpdated as int));
+    } else {
+      buf.addByte(0);
+    }
+
+    return buf.takeBytes();
+  }
+
+  // ---- decode ------------------------------------------------------------
+  static NewUser fromBytes(Uint8List input) {
+    final bv = input.buffer.asByteData();
+    int _ofs = 0;
+    int _next() => input[_ofs++]; // 1 byte shortcut
+    int _readI32() {
+      final v = bv.getInt32(_ofs, Endian.little);
+      _ofs += 4;
+      return v;
+    }
+
+    int _readI64() {
+      final v = bv.getInt64(_ofs, Endian.little);
+      _ofs += 8;
+      return v;
+    }
+
+    double _readF64() {
+      final v = bv.getFloat64(_ofs, Endian.little);
+      _ofs += 8;
+      return v;
+    }
+
+    late String uid;
+    late String displayName;
+    String? profilePhotoUrl;
+    double? locationLat;
+    double? locationLng;
+    String? voipToken;
+    String? platform;
+    String? firebaseToken;
+    int? lastUpdated;
+
+    final int _len0 = _readI32();
+    uid = utf8.decode(input.sublist(_ofs, _ofs + _len0));
+    _ofs += _len0;
+    final int _len1 = _readI32();
+    displayName = utf8.decode(input.sublist(_ofs, _ofs + _len1));
+    _ofs += _len1;
+    if (_next() == 1) {
+      final int _len2 = _readI32();
+      profilePhotoUrl = utf8.decode(input.sublist(_ofs, _ofs + _len2));
+      _ofs += _len2;
+    }
+    if (_next() == 1) {
+      locationLat = _readF64();
+    }
+    if (_next() == 1) {
+      locationLng = _readF64();
+    }
+    if (_next() == 1) {
+      final int _len5 = _readI32();
+      voipToken = utf8.decode(input.sublist(_ofs, _ofs + _len5));
+      _ofs += _len5;
+    }
+    if (_next() == 1) {
+      final int _len6 = _readI32();
+      platform = utf8.decode(input.sublist(_ofs, _ofs + _len6));
+      _ofs += _len6;
+    }
+    if (_next() == 1) {
+      final int _len7 = _readI32();
+      firebaseToken = utf8.decode(input.sublist(_ofs, _ofs + _len7));
+      _ofs += _len7;
+    }
+    if (_next() == 1) {
+      lastUpdated = _readI64();
+    }
+
+    return NewUser(
+      uid: uid,
+      displayName: displayName,
+      profilePhotoUrl: profilePhotoUrl,
+      locationLat: locationLat,
+      locationLng: locationLng,
+      voipToken: voipToken,
+      platform: platform,
+      firebaseToken: firebaseToken,
+      lastUpdated: lastUpdated,
+    );
+  }
+}
