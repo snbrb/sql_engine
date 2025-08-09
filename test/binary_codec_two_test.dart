@@ -45,7 +45,7 @@ void main() {
         profilePhotoUrl: 'https://img/προφίλ.png',
         locationLat: 37.9838,
         locationLng: 23.7275,
-        voipToken: base64.encode(List.filled(32, 0xAB)),
+        voipToken: base64.encode(List<int>.filled(32, 0xAB)),
         platform: 'android',
         firebaseToken: 'fcm_123',
         lastUpdated: DateTime(2099, 12, 31, 23, 59, 59).millisecondsSinceEpoch,

@@ -24,6 +24,7 @@ void main() {
 
     expect(users.length, 2);
 
+    // ignore: avoid_print
     print('tota users ${users.length}');
     final User alice = users.firstWhere((User u) => u.name == 'Alice');
     expect(alice.male, isFalse);

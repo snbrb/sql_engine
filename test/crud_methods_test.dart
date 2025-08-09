@@ -60,7 +60,7 @@ Future<void> createSampleData(SqlEngineDatabase db) async {
     db,
     id: 1,
     orderId: 1,
-    productName: "Product A",
+    productName: 'Product A',
     quantity: 2,
     price: 10.99,
   );
@@ -68,7 +68,7 @@ Future<void> createSampleData(SqlEngineDatabase db) async {
     db,
     id: 2,
     orderId: 1,
-    productName: "Product B",
+    productName: 'Product B',
     quantity: 1,
     price: 15.50,
   );
@@ -76,7 +76,7 @@ Future<void> createSampleData(SqlEngineDatabase db) async {
     db,
     id: 3,
     orderId: 2,
-    productName: "Product C",
+    productName: 'Product C',
     quantity: 3,
     price: 5.25,
   );
@@ -84,7 +84,7 @@ Future<void> createSampleData(SqlEngineDatabase db) async {
     db,
     id: 4,
     orderId: 3,
-    productName: "Product A",
+    productName: 'Product A',
     quantity: 1,
     price: 10.99,
   );
@@ -128,7 +128,7 @@ void main() {
     final List<User> users = await UserCrudHelpers.findWhere(
       db,
       'name = ?',
-      ['Jane Smith'], // Not wrapped in another list
+      <Object?>['Jane Smith'], // Not wrapped in another list
     );
     expect(users.first.name, equals('Jane Smith'));
   });

@@ -101,7 +101,7 @@ void main() {
         name: 'Alice',
         male: true,
         createdAt: DateTime(2025, 6, 15, 12, 34, 56),
-        data: Uint8List.fromList([1, 2, 3, 4]),
+        data: Uint8List.fromList(<int>[1, 2, 3, 4]),
         deletedAt: null, // still active → null
       );
 
