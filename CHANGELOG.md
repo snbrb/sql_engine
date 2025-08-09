@@ -1,3 +1,8 @@
+## [2.0.5] – 2025-08-09
+### Updated
+
+- dependencies are updated 
+
 ## [2.0.5] – 2025-07-05
 
 ### Added
